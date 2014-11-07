@@ -1,0 +1,110 @@
+############################################################
+# Path base shape files
+############################################################
+001SHPBASEPATH=file:///D:/development/server/apache-tomcat-6.0.35/webapps/geoserver/data/data/shapefiles
+
+
+############################################################
+# Plugin da caricare
+# Layers che prevedono l'implementazione di classi Java
+############################################################
+001PLUGIN1=it.prato.comune.sit.plugin.demo.InitLayerPlugIn
+
+
+############################################################
+# Get Feature Info Config
+# Layers che si istanziano tramite file xml Spring
+############################################################
+001LAYERSCONFIG=layers/layers.xml
+001GETFEATUREINFOLAYERSCONFIG=layers/layers_get_feature_info.xml
+
+
+############################################################
+# Definizione DataStore
+#
+# Sintassi
+# 001DSPOOLDASTPRE + PAR|FACTORY|HINTS|CASESENSITIVE| + PROGRESSIVO=VALORE
+# PAR è l'nsieme dei paramtri di connessione separati da "!!" e da ";" tra nome e valore del parametro
+#
+# ATTENZIONE!!! Prestare attenzione al progressivo, non ci devono essere "buchi" tra i datastore... 
+############################################################
+
+# DataStore WFS
+#001DSPOOLDATASTOREPAR1=WFSDataStoreFactory:GET_CAPABILITIES_URL;http://localhost:8080/geoserver/wfs?REQUEST=GetCapabilities&service=WFS&VERSION=1.0.0!!WFSDataStoreFactory:TIMEOUT;10000
+#001DSPOOLDATASTOREFACTORY1=org.geotools.data.wfs.WFSDataStoreFactory
+#001DSPOOLDATASTORECONHINTS1=N
+#001DSPOOLDATASTORECASESENSITIVE1=I
+
+# DataStore PostGis
+001DSPOOLDATASTOREPAR1=dbtype;postgis!!user;postgres!!passwd;postgres!!host;localhost!!port;5432!!database;states
+001DSPOOLDATASTOREFACTORY1=org.geotools.data.postgis.PostgisNGDataStoreFactory
+001DSPOOLDATASTORECONHINTS1=N
+001DSPOOLDATASTORECASESENSITIVE1=I
+
+# DataStore PostGis con chiave primaria esposta
+#001DSPOOLDATASTOREPAR3=Expose primary keys;true!!dbtype;postgis!!user;postgis!!passwd;postgis!!host;testpg!!port;5433!!database;mydatabase
+#001DSPOOLDATASTOREFACTORY3=org.geotools.data.postgis.PostgisNGDataStoreFactory
+#001DSPOOLDATASTORECONHINTS3=N
+#001DSPOOLDATASTORECASESENSITIVE3=I
+
+
+############################################################
+# Definizione layers
+#
+# Gestione chiavi nei layers
+# Gestista dai GeoTools: 001STATESNL_IDTPN=##FID##
+# Gestista dall'applicazione. Richiede DataStore con Expose primary keys: 001STATESNL_IDTPN=ID
+# Di seguito sono elencati alcuni esempi su come recuperare lo stesso layer con datastore diversi (tutti richiedono codice Java)
+############################################################
+
+# Layer states - Datastore tabella PostGis
+001STATESCODTPN=1
+001STATESNOMELAYER=Layer demo states PG
+001STATESDSPOOLID=1
+001STATESTYPENAME=states
+# Chiave primaria gestita dai GT
+#001STATESNL_IDTPN=##FID##
+# Chieve primaria gestita dall'applicazione (necessario datastore con PK esposta)
+001STATESNL_IDTPN=state_fips
+001STATESNL_NAME=state_name
+001STATESNL_ABBR=state_abbr
+001STATESNL_PERS=persons
+001STATESUR_NAME=NOME STATO
+001STATESUR_ABBR=NOME ABBREVIATO
+001STATESUR_PERS=POPOLAZIONE
+001STATESRE_NAME=[a-zA-Z0-9]
+001STATESRE_ABBR=[A-Z]
+001STATESRE_PERS=[0-9]*
+
+# Layer states - Datastore shape file
+#001STATESCODTPN=1
+#001STATESNOMELAYER=Layer demo states SHP
+#001STATESSRID=EPSG:4326
+##001STATESDATASTOREPAR=url;%BASEPATH%/states.shp
+#001STATESDATASTOREPAR=url;file:C:/GEOSERVER_DATA_DIR/data/shapefiles/states.shp
+#001STATESDATASTOREFACTORY=org.geotools.data.shapefile.ShapefileDataStoreFactory
+#001STATESDATASTORECONHINTS=N
+#001STATESTYPENAME=states
+#001STATESNL_NAME=STATE_NAME
+#001STATESNL_ABBR=STATE_ABBR
+#001STATESNL_PERS=PERSONS
+#001STATESUR_NAME=NOME STATO
+#001STATESUR_ABBR=NOME ABBREVIATO
+#001STATESUR_PERS=POPOLAZIONE
+#001STATESRE_NAME=[a-zA-Z0-9]
+#001STATESRE_ABBR=[A-Z]
+#001STATESRE_PERS=[0-9]*
+
+# Layer states - Datastore WFS
+#001STATESCODTPN=1
+#001STATESNOMELAYER=Layer demo states WFS
+#001STATESSRID=EPSG:4326
+#001STATESDSPOOLID=1
+#001STATESTYPENAME=topp:states
+#001STATESNL_IDTPN=##FID##
+#001STATESNL_NAME=STATE_NAME
+#001STATESNL_ABBR=STATE_ABBR
+#001STATESUR_NAME=NOME STATO
+#001STATESUR_ABBR=NOME ABBREVIATO
+#001STATESRE_NAME=[a-zA-Z0-9]
+#001STATESRE_ABBR=[a-zA-Z0-9]

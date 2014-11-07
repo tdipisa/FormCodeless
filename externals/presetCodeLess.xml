@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- #PROPERTIES presetProperties/common.properties -->
+<parametri xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="tolomeoparametri.xsd">
+	<azioniApertura />
+	<azioniEventi>
+		<eventiLayerList>
+			<!-- eventiLayer>
+				<codTPN>1</codTPN>
+				<nomeLayer>stati_usa_plugin</nomeLayer>
+				<descrizioneLayer>Stati USA - Java Plugin WFS</descrizioneLayer>
+				<tipoGeometria>3</tipoGeometria>
+				<copertura>false</copertura>
+				<caricaLayerSeparato>false</caricaLayerSeparato>
+				<queryBuilder>true</queryBuilder>
+				<azioniEventiRicercaList>
+					<ricercaList>
+						<ricerca>
+							<idRicerca>1</idRicerca>
+						</ricerca>
+					</ricercaList>
+				</azioniEventiRicercaList>
+				<autoIdentifyAllowed>true</autoIdentifyAllowed>
+				<autoIdentifyWithHighlight>true</autoIdentifyWithHighlight>
+			</eventiLayer>
+			<eventiLayer>
+				<codTPN>2</codTPN>
+				<nomeLayer>stati_usa_spring</nomeLayer>
+				<descrizioneLayer>Stati USA - Spring WFS</descrizioneLayer>
+				<tipoGeometria>3</tipoGeometria>
+				<copertura>false</copertura>
+				<caricaLayerSeparato>false</caricaLayerSeparato>
+				<autoIdentifyAllowed>true</autoIdentifyAllowed>
+				<autoIdentifyWithHighlight>true</autoIdentifyWithHighlight>
+			</eventiLayer>
+			<eventiLayer>
+				<codTPN>3</codTPN>
+				<nomeLayer>stati_usa_wms</nomeLayer>
+				<descrizioneLayer>Stati USA - Spring WMS GetFeatureInfo</descrizioneLayer>
+				<tipoGeometria>3</tipoGeometria>
+				<copertura>false</copertura>
+				<caricaLayerSeparato>false</caricaLayerSeparato>
+				<autoIdentifyAllowed>true</autoIdentifyAllowed>
+				<autoIdentifyWithHighlight>true</autoIdentifyWithHighlight>
+				<azioniEventiVis>
+					<azioneList>
+						<azione>
+							<ajaxCall>false</ajaxCall>
+							<target>pannello</target>
+							<useWMSGetFeatureInfo>true</useWMSGetFeatureInfo>
+						</azione>
+					</azioneList>
+					<autoVisOnSelect>true</autoVisOnSelect>
+				</azioniEventiVis>
+			</eventiLayer-->
+			<eventiLayer>
+				<codTPN>1</codTPN>
+				<nomeLayer>stati_usa_plugin</nomeLayer>
+				<descrizioneLayer>Stati USA - Standard</descrizioneLayer>
+				<tipoGeometria>3</tipoGeometria>
+				<copertura>false</copertura>
+				<caricaLayerSeparato>false</caricaLayerSeparato>
+				<!-- Azione di ricerca -->
+				<azioniEventiRicercaList>
+					<ricercaList>
+						<ricerca>
+							<idRicerca>1</idRicerca>
+						</ricerca>
+					</ricercaList>
+				</azioniEventiRicercaList>
+				<!-- Azione di identify -->
+				<azioniEventiVis>
+	  				<azioneList>
+	  					<azione>
+	  						<ajaxCall>true</ajaxCall>
+	  						<url>/tolomeobinj/LayerItemServlet</url>
+	  						<target>formCodeless</target>
+	  						<command>view</command>
+	  					</azione>
+	  				</azioneList>
+	  			</azioniEventiVis>
+	  			<!-- Azione di cancellazione -->
+	  			<azioniEventiCanc>
+	  				<azioneList>
+	  					<azione>
+	  						<ajaxCall>true</ajaxCall>
+	  						<url>/tolomeobinj/LayerItemServlet</url>
+	  						<target>formCodeless</target>
+	  						<command>delete</command>
+	  					</azione>
+	  				</azioneList>
+	  			</azioniEventiCanc>
+	  			<!-- Azione di inserimento -->
+	  			<azioniEventiIns>
+	  				<azioneList>
+	  					<azione>
+	  						<ajaxCall>true</ajaxCall>
+	  						<url>/tolomeobinj/LayerItemServlet</url>
+	  						<target>formCodeless</target>
+	  						<command>new</command>
+	  					</azione>
+	  				</azioneList>
+	  			</azioniEventiIns> 
+	  			<!-- Azione di modifica -->
+	  			<azioniEventiUpdateAlpha>
+	  				<azioneList>
+	  					<azione>
+	  						<ajaxCall>true</ajaxCall>
+	  						<url>/tolomeobinj/LayerItemServlet</url>
+	  						<target>formCodeless</target>
+	  						<command>edit</command>
+	  					</azione>
+	  				</azioneList>
+	  			</azioniEventiUpdateAlpha> 
+				<autoIdentifyAllowed>true</autoIdentifyAllowed>
+				<autoIdentifyWithHighlight>true</autoIdentifyWithHighlight>
+			</eventiLayer>
+		    <!-- eventiLayer>
+				<codTPN>2</codTPN>
+				<nomeLayer>stati_usa_spring</nomeLayer>
+				<descrizioneLayer>Stati USA - Spring</descrizioneLayer>
+				<tipoGeometria>3</tipoGeometria>
+				<copertura>false</copertura>
+				<caricaLayerSeparato>false</caricaLayerSeparato>
+				<azioniEventiRicercaList>
+					<ricercaList>
+						<ricerca>
+							<idRicerca>1</idRicerca>
+						</ricerca>
+					</ricercaList>
+				</azioniEventiRicercaList>
+				<azioniEventiVis>
+	  				<azioneList>
+	  					<azione>
+	  						<ajaxCall>true</ajaxCall>
+	  						<url>/tolomeobinj/LayerItemServlet</url>
+	  						<target>pannello</target>
+	  						<command>eccomi</command>
+	  					</azione>
+	  				</azioneList>
+	  			</azioniEventiVis>
+				<autoIdentifyAllowed>true</autoIdentifyAllowed>
+				<autoIdentifyWithHighlight>true</autoIdentifyWithHighlight>
+			</eventiLayer-->
+		</eventiLayerList>
+	</azioniEventi>
+	<layOut>
+		<nascondiBottoniInattivi>false</nascondiBottoniInattivi>
+		<conStreetView>false</conStreetView>
+	</layOut>
+	<mappe>
+		<mappaList>
+			<mappa>
+				<nome>WMS Demo</nome>
+				<typeDescription>WMS</typeDescription>
+				<url>#P{geoserver.wms.url}</url>
+				<tilesMultiple>true</tilesMultiple>
+				<mapOptions>format:'image/png'</mapOptions>
+				<legenda>
+					<categoryList>
+						<category>
+							<name>Stati Uniti</name>
+							<layerList>
+								<!-- layer>
+									<expanded>true</expanded>
+									<name>topp:states</name>
+									<descrizione>Stati USA - Java Plugin WFS</descrizione>
+									<codTPN>1</codTPN>
+								</layer>
+								<layer>
+									<name>topp:states</name>
+									<codTPN>2</codTPN>
+									<defaultStyle>polygon</defaultStyle>
+									<descrizione>Stati USA - Spring WFS</descrizione>
+									<expanded>true</expanded>
+								</layer>
+								<layer>
+									<name>topp:states</name>
+									<codTPN>3</codTPN>
+									<defaultStyle>polygon</defaultStyle>
+									<descrizione>Stati USA - Spring WMS GetFeatureInfo</descrizione>
+									<expanded>true</expanded>
+								</layer-->
+								<layer>
+									<expanded>true</expanded>
+									<name>states</name>
+									<descrizione>Stati USA - Standard</descrizione>
+									<codTPN>1</codTPN>
+								</layer>
+								<!-- layer>
+									<expanded>true</expanded>
+									<name>states</name>
+									<descrizione>Stati USA - Spring</descrizione>
+									<codTPN>2</codTPN>
+								</layer-->
+							</layerList>
+						</category>
+					</categoryList>
+				</legenda>
+				<SRID>EPSG:4326</SRID>
+				<nomeCredenzialeREST>ADMIN</nomeCredenzialeREST>
+				<units>dd</units>
+			</mappa>
+		</mappaList>
+		<SRID>EPSG:4326</SRID>
+		<maxExtentBottom>18</maxExtentBottom>
+		<maxExtentLeft>-139</maxExtentLeft>
+		<maxExtentRight>-51</maxExtentRight>
+		<maxExtentTop>55</maxExtentTop>
+		<maxScale>200000</maxScale>
+		<minScale>45000000</minScale>
+		<zoomLevels>45000000,25000000,12000000,6000000,3000000,1000000,500000,200000</zoomLevels>
+		<units>dd</units>
+		<settableZoom>true</settableZoom>
+	</mappe>
+</parametri>
