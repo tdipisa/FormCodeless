@@ -369,7 +369,7 @@ Ext.define('TolomeoExt.ToloPanelBase', {
 			    paramsJS  : this.paramsJS, 
 				TOLOMEOServer : this.TOLOMEOServer,
 				TOLOMEOContext: this.TOLOMEOContext,
-				cmdToolbar: this.toolbar,
+//				cmdToolbar: this.toolbar,
 			    items     : new Array()
     		});
 			this.codeLessPanel = Ext.create('TolomeoExt.ToloCodeLessPanel',  this.formCodelessPanelOpt);

@@ -16,7 +16,7 @@
 		<title>Codeless Form - Comune di Prato</title>
 	
 		<link rel="stylesheet" type="text/css" href="/tolomeobinj/js/ext/extJS/resources/css/ext-all.css" />
-		<link rel="stylesheet" type="text/css" href="/tolomeobinj/js/tolomeoExt/query_builder/theme/css/querybuilder.css" />
+		<link rel="stylesheet" type="text/css" href="/tolomeobinj/js/tolomeoExt/form_codeless/theme/css/codeless.css" />
 		
 		<!-- for debug -->
 		<script type="text/javascript" src="/tolomeobinj/js/ext/extJS/ext-all-debug-w-comments.js" charset="utf-8" ></script>
@@ -35,7 +35,7 @@
 		
 		<!-- Caricamento scripts per Form Codeless -->
 		<script type="text/javascript" src="/tolomeobinj/js/tolomeoExt/form_codeless/src/ToloCodeLessPanel.js" charset="utf-8" ></script>
-		
+		<script type="text/javascript" src="/tolomeobinj/js/tolomeoExt/form_codeless/src/ToloCodelessRequestManager.js" charset="utf-8" ></script>
 		
 		<!-- Caricamento preset -->
 		<script type="text/JavaScript" src="/tolomeobinj/ToloExtParamsJSServlet?paramPreset=CodeLess" charset="utf-8"></script>

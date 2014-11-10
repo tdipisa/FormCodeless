@@ -96,7 +96,7 @@ import net.sf.json.JSONObject;
 
 
 /**
- *         
+ *      
  * @author Tobia Di Pisa at <tobia.dipisa@geo-solutions.it>
  * 
  */
@@ -131,45 +131,36 @@ public class LayerItemServlet extends TolomeoServlet {
         String resp     = null;
         
         try {
-
         	// Recupero l'oggetto Territorio
         	comunePO = getTerritorio(logger);
 	        // Recupero il layer identificato da codTPN
 	        LayerTerritorio layer = comunePO.getLayerByCodTPN(codTPN);
 	        
 	        if (layer != null) {
+	        	JSONArray view = null;
 	        	
-	        	HashMap<String, String> layerAttributeNames = layer.getNomiCampi();
-	        	HashMap<String, String> layerAttributeNamesReadable = layer.getNomiCampiLegibili();
-	        	
-	        	if(mode.equals("view") || mode.equals("edit")){
-	        		OggettoTerritorio feature = layer.cercaIDTPN(idTPN);
-	        		
-	        		Set<String> keys = layerAttributeNames.keySet();
-	        		Iterator<String> iterator = keys.iterator();
-	        		
-	        		JSONObject view = new JSONObject();
-	        		view.put("Livello", layer.getNome());
-	        		
-	        		while(iterator.hasNext()){
-	        			String key = (String)iterator.next();
-	        			
-	        			String nr = layerAttributeNamesReadable.get(key);
-	        			String nl = layerAttributeNames.get(key);
-	        			view.put(nr != null ? nr : nl, feature.getAttributeByNL(key));
-	        		}
-	        		
-	        		JSONObject responseObj = SITExtStore.extStoreSingleRecord(view, null);
-	        		responseObj.put("security", "all");
-		        	resp = responseObj.toString();
+	        	if(mode.equals("view")){
+	        		HashMap<String, String> layerAttributeNames = layer.getNomiCampi();
+	        		view = this.buildOutputConfiguration(idTPN, layer, layerAttributeNames, false);
+	        	}else if(mode.equals("edit")){
+	        		HashMap<String, String> layerAttributeNames = layer.getNomiCampiScrittura();
+	        		view = this.buildOutputConfiguration(idTPN, layer, layerAttributeNames, true);
 	        	}
+	        	
+        		JSONObject responseObj = SITExtStore.extStore(view, null);//.extStoreSingleRecord(view, null);
+        		responseObj.put("security", "all");
+	        	resp = responseObj.toString();
 	        	
 	        } else {
 	        	String errMsg = "Il layer con codice " + codTPN + " è nullo";
 	        	resp = new ExtStoreError(errMsg,null).toJSONString();
 	            logger.error(errMsg);
 	        }
-        } finally {        	
+        } catch (SITException e) {
+        	String errMsg = e.getMessage();
+        	resp = new ExtStoreError(errMsg, null).toJSONString();
+            logger.error(errMsg);
+		} finally {        	
                 
             if(comunePO != null){
                 try {
@@ -182,6 +173,60 @@ public class LayerItemServlet extends TolomeoServlet {
             request.setAttribute("geometry", resp);
             forward(request, response);
         }
+    }
+    
+    /**
+     * Restituisce la configurazione di output per la form codeless.
+     * 
+     * @param idTPN
+     * @param layer
+     * @param layerAttributeNames
+     * @param editable
+     * @return JSONArray
+     * @throws SITException
+     */
+    private JSONArray buildOutputConfiguration(String idTPN, LayerTerritorio layer, 
+    		HashMap<String, String> layerAttributeNames, boolean editable) throws SITException{
+    	
+    	HashMap<String, String> layerAttributeNamesReadable = layer.getNomiCampiLegibili();
+    	
+		OggettoTerritorio feature = layer.cercaIDTPN(idTPN);
+		
+    	HashMap<String, Class<?>> layerAttributeTypes = null;
+ 
+    	layerAttributeTypes = layer.getAttributiTipo();
+    	
+		Set<String> keys = layerAttributeNames.keySet();
+		Iterator<String> iterator = keys.iterator();
+		
+		JSONArray view = new JSONArray();
+		
+		JSONObject levelName = new JSONObject();
+		levelName.put("name", "Livello");
+		levelName.put("value", layer.getNome());
+		levelName.put("type", layer.getNome().getClass());
+		levelName.put("editable", false);
+		
+		view.add(levelName);
+		
+		while(iterator.hasNext()){
+			String key = (String)iterator.next();
+			
+			String nr = layerAttributeNamesReadable.get(key);
+			String nl = layerAttributeNames.get(key);
+			
+			JSONObject attribute = new JSONObject();
+			attribute.put("name", nr != null ? nr : nl);
+			attribute.put("value", feature.getAttributeByNL(key));
+			attribute.put("type", layerAttributeTypes.get(key));
+			
+			boolean edit = key.equals("NL_IDTPN") ? false : editable;        			
+			attribute.put("editable", edit);
+			
+			view.add(attribute);
+		}
+		
+		return view;
     }
 
     @Override

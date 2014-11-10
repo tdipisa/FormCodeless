@@ -104,12 +104,7 @@
 	  			<!-- Azione di modifica -->
 	  			<azioniEventiUpdateAlpha>
 	  				<azioneList>
-	  					<azione>
-	  						<ajaxCall>true</ajaxCall>
-	  						<url>/tolomeobinj/LayerItemServlet</url>
-	  						<target>formCodeless</target>
-	  						<command>edit</command>
-	  					</azione>
+	  					<azione></azione>
 	  				</azioneList>
 	  			</azioniEventiUpdateAlpha> 
 				<autoIdentifyAllowed>true</autoIdentifyAllowed>

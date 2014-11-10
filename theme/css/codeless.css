@@ -1,0 +1,16 @@
+.tolomeo-formcodelessbbar .x-toolbar {
+    background: transparent;
+    border: none !important;
+}
+
+/*.x-btn .edit {
+    background-image: url(../img/table_edit.png);
+}
+
+.x-btn .view {
+    background-image: url(../img/table.png);
+}*/
+
+.x-btn .save {
+    background-image: url(../img/table_save.png);
+}
