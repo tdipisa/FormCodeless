@@ -82,6 +82,7 @@ import it.prato.comune.tolomeo.utility.ExtStoreError;
 import it.prato.comune.utilita.logging.interfaces.LogInterface;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -114,7 +115,7 @@ public class LayerItemServlet extends TolomeoServlet {
         doPost(req, resp);
     }
 
-    @Override
+	@Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         
     	// Recupero il logger
@@ -124,6 +125,7 @@ public class LayerItemServlet extends TolomeoServlet {
         Integer codTPN = getCodTPN(request);
         String mode = request.getParameter("command");
         String idTPN = request.getParameter("IDTPN");
+        String data = request.getParameter("data");
         
         logger.debug("LayerItemServlet codTPN: " + codTPN);
         
@@ -137,17 +139,31 @@ public class LayerItemServlet extends TolomeoServlet {
 	        LayerTerritorio layer = comunePO.getLayerByCodTPN(codTPN);
 	        
 	        if (layer != null) {
-	        	JSONArray view = null;
+	        	JSONObject responseObj = null;
 	        	
 	        	if(mode.equals("view")){
 	        		HashMap<String, String> layerAttributeNames = layer.getNomiCampi();
-	        		view = this.buildOutputConfiguration(idTPN, layer, layerAttributeNames, false);
+	        		JSONArray view = this.buildOutputConfiguration(idTPN, layer, layerAttributeNames, false);
+	        		responseObj = SITExtStore.extStore(view, null);
 	        	}else if(mode.equals("edit")){
-	        		HashMap<String, String> layerAttributeNames = layer.getNomiCampiScrittura();
-	        		view = this.buildOutputConfiguration(idTPN, layer, layerAttributeNames, true);
+	        		responseObj = this.buildEditResponse(layer, idTPN);
+	        	}else if(mode.equals("update")){
+	        		JSONArray values = JSONArray.fromObject(data);
+	        		
+	        		OggettoTerritorio feature = layer.cercaIDTPN(idTPN);
+	        		
+	        		int size = values.size();
+	        		for(int i=0; i<size; i++){
+	        			JSONObject attribute = (JSONObject)values.get(i);
+	        			
+	        			feature.setAttributeByNL((String)attribute.get("nl"), attribute.get("value"));
+	        		}
+	        		
+	        		layer.modifyFeature(feature);
+	        		
+	        		responseObj = this.buildEditResponse(layer, idTPN);
 	        	}
 	        	
-        		JSONObject responseObj = SITExtStore.extStore(view, null);//.extStoreSingleRecord(view, null);
         		responseObj.put("security", "all");
 	        	resp = responseObj.toString();
 	        	
@@ -157,6 +173,10 @@ public class LayerItemServlet extends TolomeoServlet {
 	            logger.error(errMsg);
 	        }
         } catch (SITException e) {
+        	String errMsg = e.getMessage();
+        	resp = new ExtStoreError(errMsg, null).toJSONString();
+            logger.error(errMsg);
+		} catch (SQLException e) {
         	String errMsg = e.getMessage();
         	resp = new ExtStoreError(errMsg, null).toJSONString();
             logger.error(errMsg);
@@ -173,6 +193,87 @@ public class LayerItemServlet extends TolomeoServlet {
             request.setAttribute("geometry", resp);
             forward(request, response);
         }
+    }
+	
+    /* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServlet#doDelete(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	 */
+	@Override
+	protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		// Recupero il logger
+        LogInterface logger = getLogger(request);
+        
+        // Recupero i parametri
+        Integer codTPN = getCodTPN(request);
+        String mode = request.getParameter("command");
+        String idTPN = request.getParameter("IDTPN");
+        
+        logger.debug("LayerItemServlet.delete codTPN: " + codTPN);
+        
+        SITLayersManager comunePO = null;
+        String resp     = null;
+        
+        try {
+        	// Recupero l'oggetto Territorio
+        	comunePO = getTerritorio(logger);
+	        // Recupero il layer identificato da codTPN
+	        LayerTerritorio layer = comunePO.getLayerByCodTPN(codTPN);
+	        
+	        if (layer != null) {
+	        	JSONObject responseObj = null;
+	        	
+	        	if(mode.equals("delete")){
+		        	OggettoTerritorio feature = layer.cercaIDTPN(idTPN);
+		        	layer.removeFeature(feature);
+		        	
+		        	responseObj = SITExtStore.extStoreFromString("Cancellazione della feature avvenuta con successo.");
+	        	}
+	        	
+        		responseObj.put("security", "all");
+	        	resp = responseObj.toString();
+	        	
+	        } else {
+	        	String errMsg = "Il layer con codice " + codTPN + " è nullo";
+	        	resp = new ExtStoreError(errMsg,null).toJSONString();
+	            logger.error(errMsg);
+	        }
+        } catch (SITException e) {
+        	String errMsg = e.getMessage();
+        	resp = new ExtStoreError(errMsg, null).toJSONString();
+            logger.error(errMsg);
+		} catch (SQLException e) {
+        	String errMsg = e.getMessage();
+        	resp = new ExtStoreError(errMsg, null).toJSONString();
+            logger.error(errMsg);
+		} finally {        	
+                
+            if(comunePO != null){
+                try {
+                    comunePO.dispose();
+                } catch (SITException e) {
+                    logger.error("Impossibile fare il dispose del LayersManager",e);
+                }
+            }
+            
+            request.setAttribute("geometry", resp);
+            forward(request, response);
+        }
+	}
+    
+    /**
+     * @param layer
+     * @param idTPN
+     * @return JSONObject
+     * @throws SITException
+     */
+    private JSONObject buildEditResponse(LayerTerritorio layer, String idTPN) throws SITException{
+		HashMap<String, String> layerAttributeNames = layer.getNomiCampiScrittura();
+		JSONArray view = this.buildOutputConfiguration(idTPN, layer, layerAttributeNames, true);
+		JSONObject responseObj = SITExtStore.extStore(view, null);
+		
+		return responseObj;
     }
     
     /**
@@ -203,6 +304,7 @@ public class LayerItemServlet extends TolomeoServlet {
 		
 		JSONObject levelName = new JSONObject();
 		levelName.put("name", "Livello");
+		levelName.put("nl", "");
 		levelName.put("value", layer.getNome());
 		levelName.put("type", layer.getNome().getClass());
 		levelName.put("editable", false);
@@ -217,6 +319,7 @@ public class LayerItemServlet extends TolomeoServlet {
 			
 			JSONObject attribute = new JSONObject();
 			attribute.put("name", nr != null ? nr : nl);
+			attribute.put("nl", key);
 			attribute.put("value", feature.getAttributeByNL(key));
 			attribute.put("type", layerAttributeTypes.get(key));
 			

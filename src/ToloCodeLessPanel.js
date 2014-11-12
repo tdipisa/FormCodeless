@@ -40,28 +40,21 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 	editFieldSetTitle: "Modifica Dati",
 	
 	/**
-	 * @property {TolomeoExt.ToloMapAPIExt} mapApiExt
-	 * Oggetto di controllo della mappa.
+	 * @property {TolomeoExt.ToloCodelessManager} codelessManager
+	 * Gestore delle operazioni del componente.
 	 */
 	
 	/**
-	 * @property {Boolean} editing
-	 * Stabilisce se le form deve consentire la modifica.
+	 * @property {Ext.grid.Panel} propertyGrid
+	 * Griglia ExtJs per la presentazione e la modifica dei dati richiesti.
 	 */
-	
-	/**
-	 * @property {String} currentGeoOp
-	 * Rappresenta l'operazione corrente attiva sulla form.
-	 */
-	
+
 	/**
      * Inizializza un nuovo TolomeoExt.ToloCodeLessPanel.
      * @param {Object} [config] Un opzionale oggetto di configurazione per il componente ExtJs.
      */
 	initComponent: function(config){
 		TolomeoExt.Vars.ApplyIfDefaults(this);
-		
-		this.registerManagerListeners();
 		
 		var gridStore = Ext.create('Ext.data.Store', {
 		    fields: ["name", "value"],
@@ -88,6 +81,10 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
             	  header: 'Nome',  
             	  dataIndex: 'name', 
             	  flex: 50/100
+              },              {
+            	  header: 'NL',  
+            	  dataIndex: 'nl',
+                  hidden: true
               },
               {
             	  header: 'Tipo',  
@@ -145,10 +142,8 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
             plugins: [cellEditing],
 			listeners: {
 				scope: this,
-				beforeedit: function(grid, cell){
-					if(!this.editing){
-						return false;
-					}
+				edit: function(grid, cell){
+					this.setBtnStatus(true);
 				}
 			}
 		});
@@ -174,157 +169,113 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 		    items: [
 	            this.fieldSet
 		    ],
-		    buttons: [/*{
+		    buttons: [{
 		    	xtype: "button", 
 		    	minWidth: '20',
-		    	ref: "viewButton",
-		    	tooltip: "Torna alla modalità di visualizzazione",
-		    	iconCls: "view",
-		    	scope: this,
+		    	ref: "resetButton",
+		    	tooltip: "Reimposta Campi",
+		    	iconCls: "reset",
+		    	disabled: true,
 		    	hidden: true,
+		    	scope: this,
 		    	handler: function(button){
-		    		var store = this.propertyGrid.getStore();
-		    		this.setFormMode("view", store);
-		    		
-		    		//
-		    		// Change buttons mode 
-		    		// 
-		    		this.formPanel.query("button[ref=viewButton]")[0].hide();
-		    		this.formPanel.query("button[ref=editButton]")[0].show();
+		    		Ext.MessageBox.confirm(
+	    				'Ripristino', 
+	    				'Procedere con il ripristoni dei dati allo stato iniziale?', 
+	    				function(btn){
+		    			   if(btn === 'yes'){
+		    				   this.codelessManager.restore();
+		    			   }
+	    				}, 
+	    				this
+    				);
 		    	}
 		    },{
-		    	xtype: "button", 
-		    	minWidth: '20',
-		    	ref: "editButton",
-		    	tooltip: "Edita Campi",
-		    	iconCls: "edit",
-		    	scope: this,
-		    	handler: function(button){
-		    		var store = this.propertyGrid.getStore();
-		    		this.setFormMode("edit", store);
-		    		
-		    		//
-		    		// Change buttons mode 
-		    		// 
-		    		this.formPanel.query("button[ref=viewButton]")[0].show();
-		    		this.formPanel.query("button[ref=editButton]")[0].hide();
-		    	}
-		    },*/{
 		    	xtype: "button", 
 		    	minWidth: '20',
 		    	ref: "saveButton",
 		    	tooltip: "Applica Modifiche",
 		    	iconCls: "save",
+		    	disabled: true,
 		    	hidden: true,
 		    	scope: this,
 		    	handler: function(button){
-		    		var store = this.propertyGrid.getStore();
 		    		
+		    		// //////////////////////////////////
+		    		// TODO: here the validity check!
+		    		// //////////////////////////////////
+		    		
+		    		Ext.MessageBox.confirm(
+	    				'Salvataggio', 
+	    				'Procedere con il salvataggio?', 
+	    				function(btn){
+		    			   if(btn === 'yes'){
+		    				   this.codelessManager.update();
+		    			   }
+	    				}, 
+	    				this
+    				);
 		    	}
 		    }]
 		});
 		
 		this.callParent();
+		this.buildManager(gridStore);
 		
 		this.add([this.formPanel]);
 	},
 	
 	/**
      * Crea il Gestore delle richieste se assente e registra gli eventi necessari.
-     * @param {TolomeoExt.ToloCodelessRequestManager} requestManager Gestore delle richieste per la form codeless.
+     * @param {Ext.Data.Store} store Store che il Manager deve gestire.
      */
-	registerManagerListeners: function(requestManager){
-		if(!requestManager){
-			this.requestManager = Ext.create('TolomeoExt.ToloCodelessRequestManager', {
-				TOLOMEOServer : this.TOLOMEOServer,
-				TOLOMEOContext: this.TOLOMEOContext
-			});
-		}
+	buildManager: function(store){
+		this.codelessManager = Ext.create('TolomeoExt.ToloCodelessManager', {
+			TOLOMEOServer : this.TOLOMEOServer,
+			TOLOMEOContext: this.TOLOMEOContext,
+			store: store
+		});
 		
-		this.requestManager.on({
-			loaddata: function(store){
-				this.setFormMode("edit", store);
-				// ////////////////////////////////////////////////////////
-				// TODO: Fix this, the event (actionsEnd) is fired two 
-				// times (see also this.setMapApiExt.on('actionsEnd'))
-				// ////////////////////////////////////////////////////////
-				this.currentGeoOp = undefined;
+		this.codelessManager.on({
+			changemode: function(mode, store){
+				this.setFormMode(mode, store);
+			},
+			objectselected: function(){
+				this.hideForm();
+			},
+			restore: function(){
+				this.setBtnStatus(false);
+			},
+			updatedata: function(){
+				this.setBtnStatus(false);
 			},
 			scope: this
 		});
 	},
 	
 	/**
-     * Imposta l'oggetto di controllo della mappa per intercettare le 
+     * Imposta sul Manager l'oggetto di controllo della mappa per intercettare le 
      * operazioni utente (eventi tolomeo) e procedere con la gestione della form.
-     * @param {TolomeoExt.ToloMapAPIExt} mapApiExt oggetto di controllo della mappa.
+     * @param {TolomeoExt.ToloMapAPIExt} mapApiExt Oggetto di controllo della mappa.
      */
 	setMapApiExt: function(mapApiExt){
-		this.mapApiExt = mapApiExt;
-		this.mapApiExt.on({
-			onEventActionAjaxSuccess: function(eventoLayer, tipoEvento, idBtn, nStep, records, store, oggetto){
-				switch(tipoEvento){
-					case 0: // Identify
-						this.setFormMode("view", store);
-						break;
-					case 1: // Delete
-						break;
-					case 3: // Edit
-						//alert("Salvataggio avvenuto con successo");
-						break;
-					case 4: // New
-						break;
-				}
-			},
-			onObjectSelect: function(){
-				this.hideForm();
-			},
-			actionsEnd: function(values){
-				var geoOp = values.geoOp;
-				
-				// TODO: fix this, the event (actionsEnd) is fired two times.
-				if(geoOp != this.mapApiExt.operationIdentify){
-					
-					if(this.currentGeoOp != geoOp){
-						this.currentGeoOp = geoOp;
-						
-						switch(this.currentGeoOp){
-							case this.mapApiExt.operationUpdateAlfa: // Update Alpha -> 'A'
-								var fparams = {
-									codTPN: values.codTPN,
-									command: "edit",
-									IDTPN: values.IDTPN
-								}; 
-								
-								this.requestManager.loadEditMode(fparams);
-								break;
-							case this.mapApiExt.digitizeOperationInsert: // Insert -> 'N'
-								break;
-							case this.mapApiExt.operationFeatureDelete: // Cancell -> 'C'
-								break;
-						}
-					}
-				}
-			},
-			scope: this
-		});
+		this.codelessManager.setMapApiExt(mapApiExt);
 	},
 	
 	/**
      * Imposta la modalità con cui configurare la form.
-     * @param {String} mode Modalità di configurazione (view, edit).
+     * @param {String} mode Modalità di configurazione (view, edit, new).
      * @param {Ext.Data.Store} store Store con gui configurare la griglia dei dati
      */
 	setFormMode: function(mode, store){
 		if(mode == "view"){
-			this.currentGeoOp = this.mapApiExt.operationIdentify;
-			this.editing = false;
 			this.fieldSet.setTitle(this.viewFieldSetTitle);	
-			this.formPanel.query("button[ref=saveButton]")[0].hide();
+			this.setBtnVisibility(false);
 		}else if(mode == "edit"){
-			this.editing = true;
 			this.fieldSet.setTitle(this.editFieldSetTitle);
-			this.formPanel.query("button[ref=saveButton]")[0].show();
+			this.setBtnVisibility(true);
+		}if(mode == "new"){
+			
 		}
 		
 		this.showForm();
@@ -345,6 +296,32 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 	hideForm: function(){
 		this.fieldSet.hide();
 		this.formPanel.hide();
+	},
+	
+	/**
+     * Imposta lo stato dei pulsanti presenti nella toolbar del pannello di modifica.
+     */
+	setBtnStatus: function(enabled){
+		if(enabled === true){
+			this.formPanel.query("button[ref=resetButton]")[0].enable();
+			this.formPanel.query("button[ref=saveButton]")[0].enable();
+		}else{
+			this.formPanel.query("button[ref=resetButton]")[0].disable();
+			this.formPanel.query("button[ref=saveButton]")[0].disable();
+		}
+	},
+	
+	/**
+     * Imposta la visibilità dei pulsanti presenti nella toolbar del pannello di modifica.
+     */
+	setBtnVisibility: function(visible){
+		if(visible === true){
+			this.formPanel.query("button[ref=saveButton]")[0].show();
+			this.formPanel.query("button[ref=resetButton]")[0].show();
+		}else{
+			this.formPanel.query("button[ref=saveButton]")[0].hide();
+			this.formPanel.query("button[ref=resetButton]")[0].hide();
+		}
 	}
     
 });

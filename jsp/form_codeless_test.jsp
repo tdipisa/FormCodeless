@@ -35,7 +35,7 @@
 		
 		<!-- Caricamento scripts per Form Codeless -->
 		<script type="text/javascript" src="/tolomeobinj/js/tolomeoExt/form_codeless/src/ToloCodeLessPanel.js" charset="utf-8" ></script>
-		<script type="text/javascript" src="/tolomeobinj/js/tolomeoExt/form_codeless/src/ToloCodelessRequestManager.js" charset="utf-8" ></script>
+		<script type="text/javascript" src="/tolomeobinj/js/tolomeoExt/form_codeless/src/ToloCodelessManager.js" charset="utf-8" ></script>
 		
 		<!-- Caricamento preset -->
 		<script type="text/JavaScript" src="/tolomeobinj/ToloExtParamsJSServlet?paramPreset=CodeLess" charset="utf-8"></script>

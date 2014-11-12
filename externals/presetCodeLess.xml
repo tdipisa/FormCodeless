@@ -83,10 +83,6 @@
 	  			<azioniEventiCanc>
 	  				<azioneList>
 	  					<azione>
-	  						<ajaxCall>true</ajaxCall>
-	  						<url>/tolomeobinj/LayerItemServlet</url>
-	  						<target>formCodeless</target>
-	  						<command>delete</command>
 	  					</azione>
 	  				</azioneList>
 	  			</azioniEventiCanc>
@@ -178,7 +174,7 @@
 								</layer-->
 								<layer>
 									<expanded>true</expanded>
-									<name>states</name>
+									<name>it.geosolutions:states</name>
 									<descrizione>Stati USA - Standard</descrizione>
 									<codTPN>1</codTPN>
 								</layer>

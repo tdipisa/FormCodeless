@@ -14,3 +14,7 @@
 .x-btn .save {
     background-image: url(../img/table_save.png);
 }
+
+.x-btn .reset {
+    background-image: url(../img/edit-clear.png);
+}
