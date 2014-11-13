@@ -40,6 +40,12 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 	editFieldSetTitle: "Modifica Dati",
 	
 	/**
+	 * @cfg {String} newFieldSetTitle
+	 * Testo del field set in modalità di nuovo elemento.
+	 */
+	newFieldSetTitle: "Nuovo Elemento",
+	
+	/**
 	 * @property {TolomeoExt.ToloCodelessManager} codelessManager
 	 * Gestore delle operazioni del componente.
 	 */
@@ -95,7 +101,7 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
             	  header: 'Editabile',  
             	  dataIndex: 'editable',
                   hidden: true
-              },              
+              }, 
               {
             	  header: 'Valore', 
             	  dataIndex: 'value', 
@@ -210,7 +216,14 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 	    				'Procedere con il salvataggio?', 
 	    				function(btn){
 		    			   if(btn === 'yes'){
-		    				   this.codelessManager.update();
+		    				   var store = this.propertyGrid.getStore();
+		    				   var record = store.findRecord("nl", "NL_IDTPN");
+		    				   
+		    				   if(record == null){
+		    					   this.codelessManager.create();
+		    				   }else{
+		    					   this.codelessManager.update();
+		    				   }
 		    			   }
 	    				}, 
 	    				this
@@ -249,6 +262,14 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 			updatedata: function(){
 				this.setBtnStatus(false);
 			},
+			createdata: function(){
+				this.setBtnStatus(false);
+			},
+			deletedata: function(){
+				this.setBtnStatus(false);
+				this.setBtnVisibility(false);
+				this.hideForm();
+			},
 			scope: this
 		});
 	},
@@ -275,7 +296,8 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 			this.fieldSet.setTitle(this.editFieldSetTitle);
 			this.setBtnVisibility(true);
 		}if(mode == "new"){
-			
+			this.fieldSet.setTitle(this.newFieldSetTitle);
+			this.setBtnVisibility(true);
 		}
 		
 		this.showForm();

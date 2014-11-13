@@ -4688,164 +4688,164 @@ Ext.define('TolomeoExt.ToloMapAPIExt', {
 				while ( (nStep<azioniEventi.azioneList.length) && !bExit ) {
 					azione = azioniEventi.azioneList[nStep];
 					
-					var url;
-					var urlcompleta;
-					
-					 
-					
-					// definizione url
-					/*
-					if (azione.redirect) {
-						if (nextActionObj.redirectUrl) {
-							url = nextActionObj.redirectUrl;
-						} else {
-							url = azione.redirectUrl;
-						}
-					} else {
-						url = azione.url;
-					}
-					*/
-					
-					if (azione.redirect) {
-						if (nextActionObj.redirectUrl) {
-							url = nextActionObj.redirectUrl;
-						} else {
-							url = azione.redirectUrl;
-						}
-					} else {
-						// if (azione.useWMSGetFeatureInfo && oggetto.getFeatureInfoLink!=undefined && oggetto.getFeatureInfoLink!=null && oggetto.getFeatureInfoLink!="") {
-						if (azione.useWMSGetFeatureInfo && oggetto.getFeatureInfoLink) {
-							url = oggetto.getFeatureInfoLink;
-							this.clearHighLigthed();
-							if (oggetto.relatedGeoms!=undefined && oggetto.relatedGeoms!=null) this.addHighlighted(oggetto.relatedGeoms, false);
-						} else { 						
-							url = azione.url;
-						}
-					}
-					
-					if(!url) {
+					if(azione.codeless){
+						this.fireEvent("codelessaction", eventoLayer, tipoEvento, oggetto);
+					}else{
+						var url;
+						var urlcompleta;
 						
-						this.fireEvent('visualize', eventoLayer.codTPN, keyValue);
-						
-					} else {
-					
+						// definizione url
 						/*
-						// sostituzione dei valori #JS{} presenti nel tag <url> del file di preset						
-						stringEx = /#JS{{1}[A-Z,a-z,0-9,_,., \/]*}/;
-					    stringExInit= /^#JS{{1}/;
-						stringExEnd= /}/;
-						newJSUrl='';
-						if (stringEx.test(url)) {
-						   initStringIndex= url.search(stringExInit)+ 4;
-						   endStringIndex= url.search(stringExEnd);
-						   value= url.substring(initStringIndex, endStringIndex);
-						   newJSUrl= url.replace(stringEx, eval(value));
-						   url= newJSUrl;
+						if (azione.redirect) {
+							if (nextActionObj.redirectUrl) {
+								url = nextActionObj.redirectUrl;
+							} else {
+								url = azione.redirectUrl;
+							}
+						} else {
+							url = azione.url;
 						}
 						*/
 						
-						// sostituzione dei valori #JS{} presenti nel tag <url> del file di preset
-						var stringEx     = /#JS{{1}[A-Z,a-z,0-9,_,',",.,:,\?,=,!,<,>,\*,\(,\),\[,\],\^, \/]*}/;
-					    var stringExInit = /#JS{{1}/;
-						var stringExEnd  = /}/;
-						var newJSUrl     = url;
-						var suburl       = url;
-						while (stringEx.test(suburl)) {
-							
-						   var initStringIndex = suburl.search(stringExInit);
-						   var endStringIndex  = suburl.search(stringExEnd);
-						   var name			   = suburl.substring(initStringIndex, endStringIndex+1);
-						   var value           = suburl.substring(initStringIndex+4, endStringIndex);
-						   newJSUrl			   = newJSUrl.replace(name, eval(value));
-						   suburl 			   = (endStringIndex+2 <= suburl.length) ? suburl.substring(endStringIndex+2): "";
-						   
-						}
-						url= newJSUrl;
-						
-						var questionMark = (url.indexOf("?") == -1) ? "?" : "";			
-						urlcompleta = url + questionMark + "&" +  "IDTPN=" + escape(keyValue) + '&codTPN=' + escape(eventoLayer.codTPN);
-						
-						this.condizioneListToPostVar(azioniEventi);
-						
-						if((azione.forward != null) && (azione.forward != "")){
-							urlcompleta += '&forward=' + escape(azione.forward);
-						}
-						
-						if((azione.command != null) && (azione.command != "")){
-							urlcompleta += '&command=' + escape(azione.command);
-						}
-						
-						if((nextActionObj) && (nextActionObj.parameters!=null) && (nextActionObj.parameters!="")){
-							for (var i=0; i<nextActionObj.parameters.length; i++){
-								urlcompleta += '&' + nextActionObj.parameters[i].key + "=" + escape(nextActionObj.parameters[i].value);
-							}
-							//urlcompleta += '&' + escape(nextActionObj.parameters);
-						}
-						
-						var method = (azione.method || 'POST').toUpperCase(); 
-						
-						if (!azione.ajaxCall) {
-							// azione normale (non ajax)
-							if (azione.noTolomeoDefaultParams) 
-								this.openURL (url, azione.target, method, azione.noTolomeoDefaultParams);
-							else
-								this.openURL (urlcompleta, azione.target, method);
-						} else {
-							// azione ajax
-							// � bloccante (si aspetta la fine per proseguire negli step
-							// per questo bexit e' posto a true
-							
-							//salvataggio parametri per successivo passo da callback
-							this.doEventActionsAjaxCallback.eventoLayer = eventoLayer;
-							this.doEventActionsAjaxCallback.tipoEvento	= tipoEvento;
-							this.doEventActionsAjaxCallback.keyValue	= keyValue;
-							this.doEventActionsAjaxCallback.nStep		= nStep;
-							this.doEventActionsAjaxCallback.idBtn		= idBtn;
-							this.doEventActionsAjaxCallback.oggetto		= oggetto;
-							
-							//Chiamata ajax
-							var ajaxOptions = {
-								method: method,								
-								url: urlcompleta,
-								params: {
-									geoOp: this.geoOpField.getValue(), 									
-									geoCoord: method == 'POST' ? this.geoCoordField.getValue() : null,
-									selectedList: this.selectedListField.getValue(),
-									SRID: this.paramsJS.mappe.SRID,
-									clippingCodTPN: eventoLayer.clippingCodTPN
-								},
-								scope: this,
-								success: this.doEventActionsAjaxCallback,
-								failure: this.doEventActionsAjaxFailure
-							}
-										
-							if (azione.crossDomainAjax) {
-								// Aggiunta parametro format='ext' in richiesta
-								ajaxOptions.params.format = 'ext';
-								new TolomeoExt.ToloCrossAjax().request(ajaxOptions);
+						if (azione.redirect) {
+							if (nextActionObj.redirectUrl) {
+								url = nextActionObj.redirectUrl;
 							} else {
-								Ext.Ajax.request(ajaxOptions);
+								url = azione.redirectUrl;
 							}
-							bExit = true;
+						} else {
+							// if (azione.useWMSGetFeatureInfo && oggetto.getFeatureInfoLink!=undefined && oggetto.getFeatureInfoLink!=null && oggetto.getFeatureInfoLink!="") {
+							if (azione.useWMSGetFeatureInfo && oggetto.getFeatureInfoLink) {
+								url = oggetto.getFeatureInfoLink;
+								this.clearHighLigthed();
+								if (oggetto.relatedGeoms!=undefined && oggetto.relatedGeoms!=null) this.addHighlighted(oggetto.relatedGeoms, false);
+							} else { 						
+								url = azione.url;
+							}
+						}
+						
+						if(!url) {
+							this.fireEvent('visualize', eventoLayer.codTPN, keyValue);
+						} else {
+							/*
+							// sostituzione dei valori #JS{} presenti nel tag <url> del file di preset						
+							stringEx = /#JS{{1}[A-Z,a-z,0-9,_,., \/]*}/;
+						    stringExInit= /^#JS{{1}/;
+							stringExEnd= /}/;
+							newJSUrl='';
+							if (stringEx.test(url)) {
+							   initStringIndex= url.search(stringExInit)+ 4;
+							   endStringIndex= url.search(stringExEnd);
+							   value= url.substring(initStringIndex, endStringIndex);
+							   newJSUrl= url.replace(stringEx, eval(value));
+							   url= newJSUrl;
+							}
+							*/
+							
+							// sostituzione dei valori #JS{} presenti nel tag <url> del file di preset
+							var stringEx     = /#JS{{1}[A-Z,a-z,0-9,_,',",.,:,\?,=,!,<,>,\*,\(,\),\[,\],\^, \/]*}/;
+						    var stringExInit = /#JS{{1}/;
+							var stringExEnd  = /}/;
+							var newJSUrl     = url;
+							var suburl       = url;
+							while (stringEx.test(suburl)) {
+								
+							   var initStringIndex = suburl.search(stringExInit);
+							   var endStringIndex  = suburl.search(stringExEnd);
+							   var name			   = suburl.substring(initStringIndex, endStringIndex+1);
+							   var value           = suburl.substring(initStringIndex+4, endStringIndex);
+							   newJSUrl			   = newJSUrl.replace(name, eval(value));
+							   suburl 			   = (endStringIndex+2 <= suburl.length) ? suburl.substring(endStringIndex+2): "";
+							   
+							}
+							url= newJSUrl;
+							
+							var questionMark = (url.indexOf("?") == -1) ? "?" : "";			
+							urlcompleta = url + questionMark + "&" +  "IDTPN=" + escape(keyValue) + '&codTPN=' + escape(eventoLayer.codTPN);
+							
+							this.condizioneListToPostVar(azioniEventi);
+							
+							if((azione.forward != null) && (azione.forward != "")){
+								urlcompleta += '&forward=' + escape(azione.forward);
+							}
+							
+							if((azione.command != null) && (azione.command != "")){
+								urlcompleta += '&command=' + escape(azione.command);
+							}
+							
+							if((nextActionObj) && (nextActionObj.parameters!=null) && (nextActionObj.parameters!="")){
+								for (var i=0; i<nextActionObj.parameters.length; i++){
+									urlcompleta += '&' + nextActionObj.parameters[i].key + "=" + escape(nextActionObj.parameters[i].value);
+								}
+								//urlcompleta += '&' + escape(nextActionObj.parameters);
+							}
+							
+							var method = (azione.method || 'POST').toUpperCase(); 
+							
+							if (!azione.ajaxCall) {
+								// azione normale (non ajax)
+								if (azione.noTolomeoDefaultParams) 
+									this.openURL (url, azione.target, method, azione.noTolomeoDefaultParams);
+								else
+									this.openURL (urlcompleta, azione.target, method);
+							} else {
+								// azione ajax
+								// � bloccante (si aspetta la fine per proseguire negli step
+								// per questo bexit e' posto a true
+								
+								//salvataggio parametri per successivo passo da callback
+								this.doEventActionsAjaxCallback.eventoLayer = eventoLayer;
+								this.doEventActionsAjaxCallback.tipoEvento	= tipoEvento;
+								this.doEventActionsAjaxCallback.keyValue	= keyValue;
+								this.doEventActionsAjaxCallback.nStep		= nStep;
+								this.doEventActionsAjaxCallback.idBtn		= idBtn;
+								this.doEventActionsAjaxCallback.oggetto		= oggetto;
+								
+								//Chiamata ajax
+								var ajaxOptions = {
+									method: method,								
+									url: urlcompleta,
+									params: {
+										geoOp: this.geoOpField.getValue(), 									
+										geoCoord: method == 'POST' ? this.geoCoordField.getValue() : null,
+										selectedList: this.selectedListField.getValue(),
+										SRID: this.paramsJS.mappe.SRID,
+										clippingCodTPN: eventoLayer.clippingCodTPN
+									},
+									scope: this,
+									success: this.doEventActionsAjaxCallback,
+									failure: this.doEventActionsAjaxFailure
+								}
+											
+								if (azione.crossDomainAjax) {
+									// Aggiunta parametro format='ext' in richiesta
+									ajaxOptions.params.format = 'ext';
+									new TolomeoExt.ToloCrossAjax().request(ajaxOptions);
+								} else {
+									Ext.Ajax.request(ajaxOptions);
+								}
+								bExit = true;
+							}
 						}
 					}
+					
 					nStep++;
-			
-				
+					
 				}
+				
 				if ( bLastAction || 
-				     (azione!=null && !azione.ajaxCall && nStep>=azioniEventi.azioneList.length )) {
+				     (azione!=null && !azione.ajaxCall && nStep>=azioniEventi.azioneList.length && !azione.codeless )) {
 					// dopo ultima azione...
 					if (azioniEventi.refreshAtTheEnd) {
 						this.viewer.pluginRefreshMap();
 					}
+					
 					if (azioniEventi.closeAtTheEnd) {
 						window.close();
 					}
 					
 					switch (tipoEvento) {
 					  case (this.eventVis):
-	
 					  		break;
 					  case (this.eventCanc):
 					  		this.clearSelected(false, eventoLayer.codTPN);
@@ -4862,9 +4862,7 @@ Ext.define('TolomeoExt.ToloMapAPIExt', {
 					  		break;
 					  case (this.eventRicerca):
 					  		break;
-					  		
 					}
-			
 				}
 			}
 		}
@@ -4873,7 +4871,6 @@ Ext.define('TolomeoExt.ToloMapAPIExt', {
 				// dopo ultima azione...anche se non ci sono azioni definite
 				this.eventActionsEnd(keyValue, eventoLayer.codTPN);
 		}
-				
 	},
 	
 	/**

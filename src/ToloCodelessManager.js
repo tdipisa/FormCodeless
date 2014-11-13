@@ -29,11 +29,6 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
 	 */
 	
 	/**
-	 * @property {String} currentGeoOp
-	 * Rappresenta l'operazione corrente attiva sulla form.
-	 */
-	
-	/**
 	 * @cfg {Ext.data.Store} store
 	 * Store dei dati su cui agisce il manager.
 	 */
@@ -49,6 +44,18 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
 	 * Testo da mostrare all'interno della dialog di aggiornemnto dati.
 	 */
     updateDialogText: "Non sono presenti dati da aggiornare",
+    
+	/**
+	 * @property {String} deleteDialogTitle
+	 * Titolo da mostrare per la dialog di cancellazione dati.
+	 */
+    deleteDialogTitle: "Cancellazione",
+    
+	/**
+	 * @property {String} deleteDialogText
+	 * Testo da mostrare all'interno della dialog di cancellazione dati.
+	 */
+    deleteDialogText: "Procedere con la cancellazione dei dati?",
 
 	/**
      * Crea un nuovo TolomeoExt.ToloCodelessManager.
@@ -97,6 +104,16 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
 			"deletedata",
 	        /**
 			 * @event
+			 * Lanciato prima di effettuare la richiesta di creazione di una feature.
+			 */
+			"beforecreatedata",
+	        /**
+			 * @event
+			 * Lanciato al termine della richiesta di creazione di una nuova feature se questa è andata a buon fine.
+			 */
+			"createdata",
+	        /**
+			 * @event
 			 * Lanciato a seguito della selezione di una feature in mappa.
 			 */
 			"objectselected",
@@ -121,71 +138,78 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
 	setMapApiExt: function(mapApiExt){
 		this.mapApiExt = mapApiExt;
 		this.mapApiExt.on({
-			onEventActionAjaxSuccess: function(eventoLayer, tipoEvento, idBtn, nStep, records, store, oggetto){
+			codelessaction: function(eventoLayer, tipoEvento, object){
+				this.selection = object;
+				
 				switch(tipoEvento){
 					case 0: // Identify
-						this.setMode("view", store);
+						// ///////////////////////////////////////
+						// Load all the information in order to 
+						// prepare the grid in view mode.
+						// ///////////////////////////////////////
+						var fparams = {
+							codTPN: this.selection.codTPN,
+							command: "view",
+							IDTPN: this.selection.key
+						}; 
+						
+						this.loadViewMode(fparams);
 						break;
 					case 1: // Delete
+			    		Ext.MessageBox.confirm(
+		    				this.deleteDialogTitle, 
+		    				this.deleteDialogText, 
+		    				function(btn){
+			    			   if(btn === 'yes'){
+									// ///////////////////////////////////////
+									// Delete the selected object 
+									// ///////////////////////////////////////
+									var fparams = {
+										codTPN: this.selection.codTPN,
+										command: "delete",
+										IDTPN: this.selection.key
+									}; 
+									
+									this.cancel(fparams);
+			    			   }
+		    				}, 
+		    				this
+						);
 						break;
 					case 3: // Edit
+						// ///////////////////////////////////////
+						// Load all the information in order to 
+						// prepare the grid in edit mode.
+						// ///////////////////////////////////////
+						var fparams = {
+							codTPN: this.selection.codTPN,
+							command: "edit",
+							IDTPN: this.selection.key
+						}; 
+						
+						this.loadEditMode(fparams);
 						break;
 					case 4: // New
+						// ///////////////////////////////////////
+						// Load all the information in order to 
+						// prepare the grid for a new element.
+						// ///////////////////////////////////////
+						if(!this.selection){
+							this.selection = this.mapApiExt.geoCoordField.getValue();
+							this.selection = Ext.decode(this.selection);
+						}
+						
+						var fparams = {
+							codTPN: this.selection.codTPN,
+							command: "edit"
+						}; 
+						
+						this.loadEditMode(fparams);
 						break;
 				}
-			},
+			},	
 			onObjectSelect: function(){
 				this.fireEvent("objectselected");
-			},
-			actionsEnd: function(values){
-				this.selection = values;
-				
-				// TODO: fix this, the event (actionsEnd) is fired two times.
-				if(this.selection.geoOp != this.mapApiExt.operationIdentify){
-					
-					if(this.currentGeoOp != this.selection.geoOp){
-						this.currentGeoOp = this.selection.geoOp;
-						
-						switch(this.currentGeoOp){
-							case this.mapApiExt.operationUpdateAlfa: // Update Alpha -> 'A'
-								// ///////////////////////////////////////
-								// Load all the information in order to 
-								// prepare the edit grid
-								// ///////////////////////////////////////
-								var fparams = {
-									codTPN: values.codTPN,
-									command: "edit",
-									IDTPN: values.IDTPN
-								}; 
-								
-								this.loadEditMode(fparams);
-								break;
-							case this.mapApiExt.digitizeOperationInsert: // Insert -> 'N'
-								break;
-							case this.mapApiExt.operationFeatureDelete: // Cancell -> 'C'
-//					    		Ext.MessageBox.confirm(
-//				    				'Cancellazione', 
-//				    				'Procedere con la cancellazione dei dati?', 
-//				    				function(btn){
-//					    			   if(btn === 'yes'){
-//											// ///////////////////////////////////////
-//											// Delete the selected object 
-//											// ///////////////////////////////////////
-//											var fparams = {
-//												codTPN: values.codTPN,
-//												command: "delete",
-//												IDTPN: values.IDTPN
-//											}; 
-//											
-//											this._delete(fparams);
-//					    			   }
-//				    				}, 
-//				    				this
-//			    				);
-								break;
-						}
-					}
-				}
 			},
 			scope: this
 		});
@@ -197,14 +221,6 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
      * @param {Ext.Data.Store} store Store da usare per componenti di tipo UI
      */
 	setMode: function(mode, store){
-		if(mode == "view"){
-			this.currentGeoOp = this.mapApiExt.operationIdentify;
-		}else if(mode == "edit"){
-//			this.currentGeoOp = this.mapApiExt.operationUpdateAlfa;
-		}else if(mode == "new"){
-			
-		}
-		
 		this.store = store;
 		this.fireEvent("changemode", mode, store);
 	},
@@ -219,7 +235,27 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
     },
     
     /**
-     * Metodo di caricamento dello store delle features.
+     * Metodo di caricamento dello store delle features per la modalità 'view'.
+     * @param {Object} fparams Oggetto contenente i parametri che saranno usati nella richista. 
+     *
+     */
+    loadViewMode: function(fparams){       	
+    	this.fireEvent("beforeloaddata");
+    	
+		this.request(
+			fparams,
+			"GET",
+    		function(results, store){
+				this.setMode("view", store);
+    			this.fireEvent("loaddata", store);
+    		},
+    		this.doAjaxFailure,
+    		this
+		);
+    },
+    
+    /**
+     * Metodo di caricamento dello store delle features per la modalità 'edit'.
      * @param {Object} fparams Oggetto contenente i parametri che saranno usati nella richista. 
      *
      */
@@ -259,7 +295,7 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
 				{
 					codTPN: this.selection.codTPN,
 					command: "update",
-					IDTPN: this.selection.IDTPN
+					IDTPN: this.selection.key
 				}, 
 				fparams
 			); 
@@ -304,20 +340,102 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
     	}
     },
     
-    _delete: function(fparams){
+    /**
+     * Metodo di cancellazione dei dati.
+     * @param {Object} fparams Oggetto contenente i parametri che saranno usati nella richista. 
+     *
+     */
+    cancel: function(fparams){
     	this.fireEvent("beforedeletedata");
     	
 		this.request(
 			fparams,
-			"DELETE",
+			"POST",
     		function(results){
 				if(results){
+					// /////////////////////////////////////////////////
+					// Redraw the layer in order to refresh involved 
+					// labels during the update procedures.
+					// /////////////////////////////////////////////////
+					this.mapApiExt.viewer.pluginRefreshMap();
+					
 					this.fireEvent("deletedata", results);
+					
+					// ///////////////////////////////////
+					// Inform the user that the operation 
+					// has been completed successfully
+					// ///////////////////////////////////
+		            Ext.Msg.show({
+		                title: this.deleteDialogTitle,
+		                msg: results[0].data.Descrizione,
+		                buttons: Ext.Msg.OK,
+		                icon: Ext.MessageBox.INFO
+		            }); 
 				}			
     		},
     		this.doAjaxFailure,
     		this
 		);
+    },
+    
+    /**
+     * Metodo per la raccolta dati al fine di creare un nuovo elemento.
+     * @param {Object} fparams Oggetto contenente i parametri che saranno usati nella richista. 
+     *
+     */
+    create: function(fparams){
+    	this.fireEvent("beforecreatedata");
+    	var updatedRecords = this.store.getUpdatedRecords();
+    	
+    	if(updatedRecords.length > 0){
+    		var params = Ext.applyIf(
+				{
+					codTPN: this.selection.codTPN,
+					command: "new",
+					SRID: this.selection.SRID,
+					geometry: this.selection.geometry
+				}, 
+				fparams
+			); 
+    		
+    		var data = "[";
+    		for(var i=0; i<updatedRecords.length; i++){
+    			var record = updatedRecords[i];
+    			var values = record.data;
+    			data += Ext.encode(values);
+    			
+    			if(i+1 != updatedRecords.length){
+    				data += ",";
+    			}
+    		}
+    		data += "]";
+    		
+    		params.data = data;
+    		
+    		this.request(
+				params,
+				"POST",
+				function(results, store){
+					// /////////////////////////////////////////////////
+					// Redraw the layer in order to refresh involved 
+					// labels during the update procedures.
+					// /////////////////////////////////////////////////
+					this.mapApiExt.viewer.pluginRefreshMap();
+					
+					this.setMode("edit", store);
+	    			this.fireEvent("createdata", store);
+	    		},
+	    		this.doAjaxFailure,
+	    		this
+    		);
+    	}else{
+            Ext.Msg.show({
+                title: this.updateDialogTitle,
+                msg: this.updateDialogText,
+                buttons: Ext.Msg.OK,
+                icon: Ext.MessageBox.INFO
+            }); 
+    	}
     },
     
     /**

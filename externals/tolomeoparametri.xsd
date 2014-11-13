@@ -1,0 +1,1746 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" >	
+	<xs:element name="parametri">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="azioniApertura" minOccurs="0"
+					maxOccurs="1">
+					<xs:complexType>
+						<xs:all>
+							<xs:element name="action" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:enumeration
+											value="ZoomTo">
+										</xs:enumeration>
+										<xs:enumeration
+											value="ZoomToOgg">
+										</xs:enumeration>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="coordX" type="xs:double"
+								minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>
+										Coordinata X
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="coordY" type="xs:double"
+								minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>
+										Coordinata Y
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="zoom" type="xs:int"
+								minOccurs="0">
+							</xs:element>
+							<xs:element name="zoomToCodTPN"
+								minOccurs="0" type="xs:int">
+
+							</xs:element>
+							<xs:element name="zoomToIdTPN"
+								type="xs:string" minOccurs="0">
+							</xs:element>
+							<xs:element name="urlPannello"
+								type="xs:string" minOccurs="0">
+							</xs:element>
+							<xs:element name="pannelloChiuso"
+								type="xs:boolean" maxOccurs="1" minOccurs="0">
+							</xs:element>
+							<xs:element name="conFrame"
+								type="xs:boolean" minOccurs="0">
+							</xs:element>
+							<xs:element name="linkRicerca"
+								type="xs:string" minOccurs="0">
+							</xs:element>
+							<xs:element name="modoEditingSingolo"
+								maxOccurs="1" minOccurs="0">
+								<xs:complexType>
+									<xs:all>
+										<xs:element name="layerCODTPN"
+											type="xs:int" minOccurs="1" maxOccurs="1">
+										</xs:element>
+										<xs:element name="valoreChiave"
+											type="xs:string" maxOccurs="1" minOccurs="0">
+										</xs:element>
+									</xs:all>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="SRID" type="xs:string"
+								maxOccurs="1" minOccurs="0">
+							</xs:element>
+
+							<xs:element name="distanceFromRef"
+								type="xs:double" maxOccurs="1" minOccurs="0">
+							</xs:element>
+							<xs:element name="method" minOccurs="0"
+								maxOccurs="1">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:enumeration value="GET"></xs:enumeration>
+										<xs:enumeration value="POST"></xs:enumeration>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:all>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="azioniEventi" minOccurs="0"
+					maxOccurs="1">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="eventiLayerList"
+								minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="eventiLayer"
+											maxOccurs="unbounded" minOccurs="0">
+											<xs:complexType>
+												<xs:all>
+													<xs:element
+														name="codTPN" type="xs:int" minOccurs="1" maxOccurs="1">
+													</xs:element>
+													<xs:element
+														name="nomeLayer" type="xs:string" minOccurs="1"
+														maxOccurs="1">
+													</xs:element>
+													<xs:element
+														name="descrizioneLayer" type="xs:string" minOccurs="1"
+														maxOccurs="1">
+													</xs:element>
+													<xs:element
+														name="tipoGeometria" minOccurs="1" maxOccurs="1">
+														<xs:simpleType>
+															<xs:restriction
+																base="xs:int">
+
+																<xs:enumeration
+																	value="1">
+																</xs:enumeration>
+																<xs:enumeration
+																	value="2">
+																</xs:enumeration>
+																<xs:enumeration
+																	value="3">
+																</xs:enumeration>
+																<xs:enumeration
+																	value="4">
+																</xs:enumeration>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element
+														name="copertura" type="xs:boolean" maxOccurs="1"
+														minOccurs="0">
+													</xs:element>
+													<xs:element
+														name="clippingCodTPN" type="xs:int" maxOccurs="1"
+														minOccurs="0">
+													</xs:element>
+													<xs:element
+														name="caricaLayerSeparato" type="xs:boolean" maxOccurs="1"
+														minOccurs="0">
+													</xs:element>
+													<xs:element
+														name="autoIdentifyAllowed" type="xs:boolean" maxOccurs="1"
+														minOccurs="0">
+													</xs:element>
+													<xs:element
+														name="autoIdentifyWithHighlight" type="xs:boolean"
+														maxOccurs="1" minOccurs="0">
+													</xs:element>
+													<xs:element
+														name="queryBuilder" type="xs:boolean" maxOccurs="1"
+														minOccurs="0">
+													</xs:element>
+													<xs:element
+														name="mappaLayerSeparato" type="mappaComplexType"
+														maxOccurs="1" minOccurs="0">
+													</xs:element>
+													<xs:element
+														name="azioniEventiVis" maxOccurs="1" minOccurs="0">
+														<xs:complexType>
+															<xs:all>
+																<xs:element
+																	name="closeAtTheEnd" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="azioneList" maxOccurs="1" minOccurs="1">
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element
+																				name="azione" type="eventoLayerVisType"
+																				maxOccurs="unbounded" minOccurs="0">
+																			</xs:element>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+																<xs:element
+																	name="refreshAtTheEnd" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="autoVisOnSelect" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="forceEnable" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="digitizedFeatureClear" type="xs:boolean"
+																	maxOccurs="1" minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="digitizedFeatureModifyMode" type="xs:int"
+																	maxOccurs="1" minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="condizioneList" type="condizioneListComplexType"
+																	maxOccurs="1" minOccurs="0">
+																</xs:element>
+
+															</xs:all>
+														</xs:complexType>
+													</xs:element>
+													<xs:element
+														name="azioniEventiCanc" maxOccurs="1" minOccurs="0">
+														<xs:complexType>
+															<xs:all>
+																<xs:element
+																	name="refreshAtTheEnd" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="closeAtTheEnd" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="forceEnable" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="digitizedFeatureClear" type="xs:boolean"
+																	maxOccurs="1" minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="digitizedFeatureModifyMode" type="xs:int"
+																	maxOccurs="1" minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="azioneList" maxOccurs="1" minOccurs="1">
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element
+																				name="azione" type="EventoLayerBaseType"
+																				maxOccurs="unbounded" minOccurs="1">
+																			</xs:element>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+																<xs:element
+																	name="condizioneList" type="condizioneListComplexType"
+																	maxOccurs="1" minOccurs="0">
+																</xs:element>
+															</xs:all>
+														</xs:complexType>
+													</xs:element>
+													<xs:element
+														name="azioniEventiUpdateGeom" maxOccurs="1"
+														minOccurs="0">
+														<xs:complexType>
+															<xs:all>
+																<xs:element
+																	name="closeAtTheEnd" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="forceEnable" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="digitizedFeatureClear" type="xs:boolean"
+																	maxOccurs="1" minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="digitizedFeatureModifyMode" type="xs:int"
+																	maxOccurs="1" minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="azioneList" maxOccurs="1" minOccurs="1">
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element
+																				name="azione" type="EventoLayerBaseType"
+																				maxOccurs="unbounded" minOccurs="0">
+																			</xs:element>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+																<xs:element
+																	name="refreshAtTheEnd" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="conVertexEditing" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="conDragDrop" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="conAdd" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="conSubtract" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="condizioneList" type="condizioneListComplexType"
+																	maxOccurs="1" minOccurs="0">
+																</xs:element>
+															</xs:all>
+														</xs:complexType>
+													</xs:element>
+													<xs:element
+														name="azioniEventiUpdateAlpha" maxOccurs="1"
+														minOccurs="0">
+														<xs:complexType>
+															<xs:all>
+																<xs:element
+																	name="closeAtTheEnd" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="forceEnable" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="digitizedFeatureClear" type="xs:boolean"
+																	maxOccurs="1" minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="digitizedFeatureModifyMode" type="xs:int"
+																	maxOccurs="1" minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="azioneList" maxOccurs="1" minOccurs="1">
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element
+																				name="azione" type="EventoLayerBaseType"
+																				maxOccurs="unbounded" minOccurs="0">
+																			</xs:element>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+																<xs:element
+																	name="refreshAtTheEnd" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="condizioneList" type="condizioneListComplexType"
+																	maxOccurs="1" minOccurs="0">
+																</xs:element>
+															</xs:all>
+														</xs:complexType>
+													</xs:element>
+													<xs:element
+														name="azioniEventiIns" maxOccurs="1" minOccurs="0">
+														<xs:complexType>
+															<xs:all>
+																<xs:element
+																	name="closeAtTheEnd" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="forceEnable" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="digitizedFeatureClear" type="xs:boolean"
+																	maxOccurs="1" minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="digitizedFeatureModifyMode" type="xs:int"
+																	maxOccurs="1" minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="azioneList" maxOccurs="1" minOccurs="1">
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element
+																				name="azione" type="EventoLayerBaseType"
+																				maxOccurs="unbounded" minOccurs="0">
+																			</xs:element>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+																<xs:element
+																	name="refreshAtTheEnd" type="xs:boolean" maxOccurs="1"
+																	minOccurs="0">
+																</xs:element>
+																<xs:element
+																	name="condizioneList" type="condizioneListComplexType"
+																	maxOccurs="1" minOccurs="0">
+																</xs:element>
+															</xs:all>
+														</xs:complexType>
+													</xs:element>
+
+													<xs:element
+														name="azioniEventiRicercaList" maxOccurs="1"
+														minOccurs="0">
+
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element
+																	name="ricercaList" maxOccurs="1" minOccurs="1">
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element
+																				name="ricerca" type="azioniEventiRicercaComplexType"
+																				maxOccurs="unbounded" minOccurs="1">
+																			</xs:element>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+																<!--	</xs:sequence>
+																	</xs:complexType>
+																	</xs:element> -->
+
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+
+
+													<xs:element
+														name="azioniEventiCustomButtonList" maxOccurs="1"
+														minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+
+																<xs:element
+																	name="customButtonList" maxOccurs="1" minOccurs="1">
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element
+																				name="customButton" maxOccurs="unbounded"
+																				minOccurs="1" type="customButtonComplexType">
+
+																			</xs:element>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element
+														name="customQueryOnSelect" type="xs:string" maxOccurs="1"
+														minOccurs="0">
+													</xs:element>
+													<xs:element
+														name="customQueryOnNOSelect" type="xs:string"
+														maxOccurs="1" minOccurs="0">
+													</xs:element>
+													<xs:element
+														name="snapping" maxOccurs="1" minOccurs="0">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element
+																	name="snappingLayerList">
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element
+																				name="snappingLayer" maxOccurs="unbounded"
+																				minOccurs="1">
+																				<xs:complexType>
+																					<xs:all>
+
+																						<xs:element
+																							name="name" type="xs:string" maxOccurs="1"
+																							minOccurs="1">
+																						</xs:element>
+																						<xs:element
+																							name="url" type="xs:string" maxOccurs="1"
+																							minOccurs="1">
+																							<xs:annotation>
+																								<xs:documentation>
+																									Url
+																									del
+																									WFS
+																									server
+																									da
+																									chiamare
+																									per
+																									ottenere
+																									le
+																									feature
+																								</xs:documentation>
+																							</xs:annotation>
+																						</xs:element>
+																						<xs:element
+																							name="role" type="xs:string" maxOccurs="1"
+																							minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>
+																									Ruolo
+																									con
+																									le
+																									credenziali
+																									del
+																									quale
+																									accedere
+																									alla
+																									risorsa
+																								</xs:documentation>
+																							</xs:annotation>
+																						</xs:element>
+																						<xs:element
+																							name="minScale" type="xs:int" maxOccurs="1"
+																							minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>
+																									Scala
+																									minima
+																									a
+																									cui
+																									visualizzare
+																									il
+																									layer.
+																									Es.
+																									1000
+																									implica
+																									1:1000
+																								</xs:documentation>
+																							</xs:annotation>
+																						</xs:element>
+																						<xs:element
+																							name="maxScale" type="xs:int" maxOccurs="1"
+																							minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>
+																									Scala
+																									massima
+																									a
+																									cui
+																									visualizzare
+																									il
+																									layer.
+																									Es.
+																									10000
+																									implica
+																									1:10000
+																								</xs:documentation>
+																							</xs:annotation>
+																						</xs:element>
+																						<xs:element
+																							name="srsName" type="xs:string" maxOccurs="1"
+																							minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>
+																									Esempio
+																									"EPSG:3003"
+																								</xs:documentation>
+																							</xs:annotation>
+																						</xs:element>
+
+																						<xs:element
+																							name="featureType" type="xs:string" maxOccurs="1"
+																							minOccurs="1">
+																							<xs:annotation>
+																								<xs:documentation>
+																									Nome
+																									della
+																									feature
+																									o
+																									di
+																									più
+																									feature
+																									separate
+																									da
+																									virgola
+																								</xs:documentation>
+																							</xs:annotation>
+																						</xs:element>
+																						<xs:element
+																							name="featurePrefix" type="xs:string"
+																							maxOccurs="1" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>
+																									Prefisso
+																									della
+																									feature.
+																									Es.
+																									comunepo
+																									per
+																									la
+																									feature
+																									comunepo:linee_strade
+																								</xs:documentation>
+																							</xs:annotation>
+																						</xs:element>
+																						<xs:element
+																							name="featureNS" type="xs:string" maxOccurs="1"
+																							minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>
+																									Name
+																									space
+																									della
+																									feature
+																								</xs:documentation>
+																							</xs:annotation>
+																						</xs:element>
+																						<xs:element
+																							name="geometryName" type="xs:string"
+																							maxOccurs="1" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>
+																									Nome
+																									del
+																									campo
+																									geometria
+																									da
+																									specificare
+																									nel
+																									caso
+																									del
+																									Geoserver
+																								</xs:documentation>
+																							</xs:annotation>
+																						</xs:element>
+																						<xs:element
+																							name="propertyNames" type="xs:string"
+																							maxOccurs="1" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>
+																									nomi
+																									separati
+																									da
+																									virgola
+																									degli
+																									attributi
+																									che
+																									si
+																									desidera
+																									ottene
+																									della
+																									feature.
+																									Nel
+																									caso
+																									di
+																									Mapserver
+																									occorre
+																									specificare
+																									"nome_di_un_campo,msGeometry".
+																									Nel
+																									caso
+																									del
+																									Geoserver
+																									non
+																									valorizzare
+																									questo
+																									attributo,
+																									ma
+																									solamente
+																									il
+																									nome
+																									del
+																									campo
+																									geometria
+																									nel
+																									geometryName.
+																								</xs:documentation>
+																							</xs:annotation>
+																						</xs:element>
+																						<xs:element
+																							name="outputFormat" type="xs:string"
+																							maxOccurs="1" minOccurs="0">
+																							<xs:annotation>
+																								<xs:documentation>
+																									Default
+																									JSON
+																								</xs:documentation>
+																							</xs:annotation>
+																						</xs:element>
+
+																						<xs:element
+																							name="edge" type="xs:boolean" maxOccurs="1"
+																							minOccurs="0">
+																						</xs:element>
+
+																						<xs:element
+																							name="tolerance" type="xs:int" maxOccurs="1"
+																							minOccurs="0">
+																						</xs:element>
+																					</xs:all>
+																				</xs:complexType>
+																			</xs:element>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+												</xs:all>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="layOut" minOccurs="0" maxOccurs="1">
+					<xs:complexType>
+						<xs:all>
+							<xs:element name="legendaLarg"
+								type="xs:string" maxOccurs="1" minOccurs="0">
+							</xs:element>
+							<xs:element name="testata" type="xs:boolean"
+								maxOccurs="1" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>
+										Se true viene aggiunta la
+										testata del Comune di Prato
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="urlTestata"
+								type="xs:string" maxOccurs="1" minOccurs="0">
+							</xs:element>
+							<xs:element name="piepagina"
+								type="xs:boolean" maxOccurs="1" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>
+										Se true aggiunge il footer del
+										Comune di Prato
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="urlPiepagina"
+								type="xs:string" maxOccurs="1" minOccurs="0">
+							</xs:element>
+							<xs:element name="icoSetup" type="xs:string"
+								maxOccurs="1" minOccurs="0">
+							</xs:element>
+
+
+							<xs:element name="urlTemplatePrefisso"
+								type="xs:string" maxOccurs="1" minOccurs="0">
+							</xs:element>
+							<xs:element name="nascondiBottoniInattivi"
+								type="xs:boolean" maxOccurs="1" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>
+										Se true nasconde i bottoni
+										inattivi sulla toolbar.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="customButtonList"
+								maxOccurs="1" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="customButton"
+											maxOccurs="unbounded" minOccurs="1">
+											<xs:complexType>
+												<xs:all>
+													<xs:element
+														name="idCustomButton" type="xs:string" maxOccurs="1"
+														minOccurs="1">
+													</xs:element>
+													<xs:element
+														name="iconFileName" type="xs:string" maxOccurs="1"
+														minOccurs="1">
+													</xs:element>
+													<xs:element
+														name="iconTitleMessage" type="xs:string" maxOccurs="1"
+														minOccurs="1">
+													</xs:element>
+													<xs:element
+														name="tooltipMessage" type="xs:string" maxOccurs="1"
+														minOccurs="1">
+													</xs:element>
+													<xs:element
+														name="iconAltMessage" type="xs:string" maxOccurs="1"
+														minOccurs="1">
+													</xs:element>
+													<xs:element
+														name="gruppo" type="xs:integer" maxOccurs="1"
+														minOccurs="0">
+													</xs:element>
+													<xs:element
+														name="pressFunction" type="xs:string" maxOccurs="1"
+														minOccurs="0">
+													</xs:element>
+													<xs:element
+														name="releaseFunction" type="xs:string" maxOccurs="1"
+														minOccurs="0">
+													</xs:element>
+													<xs:element
+														name="disabledMessage" type="xs:string" maxOccurs="1"
+														minOccurs="0">
+													</xs:element>
+
+													<xs:element
+														name="azioniEventiCustomButton"
+														type="customButtonComplexType" maxOccurs="1"
+														minOccurs="0">
+													</xs:element>
+												</xs:all>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="conFiltroTemporale"
+								type="xs:boolean" maxOccurs="1" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>
+										Se true aggiunge la possibilità
+										gestire un filtro temporale per
+										la mappa in uso.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="conStreetView"
+								type="xs:boolean" maxOccurs="1" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>
+										Se true aggiunge il supporto a
+										Google Street View.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="csw" type="cswType"
+								minOccurs="0" maxOccurs="1">
+							</xs:element>
+							<xs:element name="WMSExplorer"
+								type="WMSExplorerType" maxOccurs="1" minOccurs="0">
+							</xs:element>
+							<xs:element name="conExportQGIS"
+								type="xs:boolean" maxOccurs="1" minOccurs="0">
+							</xs:element>
+						</xs:all>
+					</xs:complexType>
+				</xs:element>
+
+				<xs:element name="mappe" maxOccurs="1" minOccurs="1">
+					<xs:complexType>
+						<xs:all>
+							<xs:element name="mappaList" maxOccurs="1"
+								minOccurs="1">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="mappa"
+											maxOccurs="unbounded" minOccurs="1"
+											type="mappaComplexType">
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element minOccurs="0" maxOccurs="1"
+								name="googleAPIVersion" type="xs:string">
+							</xs:element>
+							<xs:element minOccurs="0" maxOccurs="1"
+								name="googleAPIKey" type="xs:string">
+							</xs:element>
+							<xs:element name="SRID" type="xs:string"
+								maxOccurs="1" minOccurs="0">
+							</xs:element>
+							<xs:element name="units" type="xs:string"
+								maxOccurs="1" minOccurs="0">
+							</xs:element>
+							<xs:element name="maxExtentTop"
+								type="xs:double" maxOccurs="1" minOccurs="0">
+							</xs:element>
+							<xs:element name="maxExtentBottom"
+								type="xs:double" maxOccurs="1" minOccurs="0">
+							</xs:element>
+							<xs:element name="maxExtentLeft"
+								type="xs:double" maxOccurs="1" minOccurs="0">
+							</xs:element>
+							<xs:element name="maxExtentRight"
+								type="xs:double" maxOccurs="1" minOccurs="0">
+							</xs:element>
+							<xs:element name="minScale" type="xs:int"
+								maxOccurs="1" minOccurs="0">
+							</xs:element>
+							<xs:element name="maxScale" type="xs:int"
+								maxOccurs="1" minOccurs="0">
+							</xs:element>
+							<xs:element name="zoomLevels"
+								type="xs:string" maxOccurs="1" minOccurs="0">
+							</xs:element>
+							<xs:element name="settableZoom"
+								type="xs:boolean" maxOccurs="1" minOccurs="0">
+							</xs:element>
+							<xs:element name="maxPrintFormat"
+								maxOccurs="1" minOccurs="0">
+                                <xs:annotation>
+                                	<xs:documentation>Dimensione massima di stampa consentita</xs:documentation>
+                                </xs:annotation>
+                                <xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:enumeration value="A4"></xs:enumeration>
+										<xs:enumeration value="A3"></xs:enumeration>
+										<xs:enumeration value="A2"></xs:enumeration>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:all>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="serverPool" type="serverPoolType" maxOccurs="1" minOccurs="0"></xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="EventoLayerBaseType">
+		<xs:all>
+			<xs:element name="ajaxCall" type="xs:boolean" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="codeless" type="xs:boolean" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="crossDomainAjax" type="xs:boolean"
+				maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element name="url" type="xs:string" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="target" maxOccurs="1" minOccurs="0"
+				type="xs:string">
+			</xs:element>
+			<xs:element name="forward" type="xs:string" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="command" type="xs:string" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="redirect" type="xs:boolean" maxOccurs="1"
+				minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Indica se l'azione è di tipo redirect, cioè una
+						azione che determina la chiamata di un'altra url
+						definita da redirectUrl o definita dal valore di
+						ritorno dell'azione prima. Le url invocate dalle
+						azioni possono infatti ritornare un oggetto JSON
+						nextAction contenete i campi: .parameters ->
+						parameti da passare all'azione successiva
+						.redirectUrl -> Url di redirect
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="redirectUrl" type="xs:string"
+				maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element name="noTolomeoDefaultParams" type="xs:boolean" maxOccurs="1" minOccurs="0"></xs:element>
+		</xs:all>
+	</xs:complexType>
+
+	<xs:complexType name="eventoLayerVisType">
+		<xs:all>
+			<xs:element name="ajaxCall" type="xs:boolean" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+		    <xs:element name="codeless" type="xs:boolean" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="crossDomainAjax" type="xs:boolean"
+				maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element name="url" type="xs:string" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="target" maxOccurs="1" minOccurs="0"
+				type="xs:string">
+			</xs:element>
+			<xs:element name="forward" type="xs:string" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="command" type="xs:string" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="redirect" type="xs:boolean" maxOccurs="1"
+				minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Indica se l'azione è di tipo redirect, cioè una
+						azione che determina la chiamata di un'altra url
+						definita da redirectUrl o definita dal valore di
+						ritorno dell'azione prima. Le url invocate dalle
+						azioni possono infatti ritornare un oggetto JSON
+						nextAction contenete i campi: .parameters ->
+						parameti da passare all'azione successiva
+						.redirectUrl -> Url di redirect
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="redirectUrl" type="xs:string"
+				maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element name="chiudiSuDblClick" type="xs:boolean"
+				maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element name="method" minOccurs="0" maxOccurs="1">
+
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="GET"></xs:enumeration>
+						<xs:enumeration value="POST"></xs:enumeration>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="noTolomeoDefaultParams" type="xs:boolean"
+				maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element name="useWMSGetFeatureInfo" type="xs:boolean" maxOccurs="1" minOccurs="0"></xs:element>
+		</xs:all>
+	</xs:complexType>
+
+	<xs:complexType name="azioniEventiRicercaComplexType">
+		<xs:all>
+			<xs:element minOccurs="0" maxOccurs="1" name="azioneList">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="azione"
+							type="EventoLayerBaseType" maxOccurs="unbounded" minOccurs="0">
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element minOccurs="1" maxOccurs="1" name="idRicerca"
+				type="xs:int">
+			</xs:element>
+			<xs:element name="refreshAtTheEnd" type="xs:boolean"
+				maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element minOccurs="0" maxOccurs="1" name="azioneDefault"
+				type="xs:boolean">
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<xs:complexType name="mappaComplexType"> 
+		<xs:all>
+			<xs:element minOccurs="1" maxOccurs="1" name="nome"
+				type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						Indica il nome della mappa.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" maxOccurs="1" name="url"
+				type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						Indica l'url di caricamento della mappa.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tilesMultiple" type="xs:boolean"
+				maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element name="allowServerConnection" type="xs:boolean"
+				maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element name="nomeCredenzialeREST" type="xs:string"
+				maxOccurs="1" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						nome della credenziale, presente nel
+						tolomeo.properties, da utilizzare per accesso
+						REST
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" maxOccurs="1" name="mapOptions"
+				type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						Aggiunge eventuali opzioni alla mappa.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" maxOccurs="1" name="viewerOptions"
+				type="xs:string">
+			</xs:element>
+			<xs:element minOccurs="0" maxOccurs="1" name="overlay"
+				type="xs:boolean">
+			</xs:element>
+			<xs:element minOccurs="0" maxOccurs="1"
+				name="typeDescription" type="typeDescriptionType">
+				<xs:annotation>
+					<xs:documentation>
+						Indica il tipo di mappa utilizzato: MapServer,
+						GeoServer, ecc...
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" maxOccurs="1" name="SRID"
+				type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						Indica il sistema di riferimento della mappa
+						(default EPSG:26591).
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element minOccurs="0" maxOccurs="1" name="units"
+				type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						Indica il tipo di unità della mappa.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="mostraInLegenda" type="xs:boolean"
+				maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element name="legenda" maxOccurs="1" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="categoryList" maxOccurs="1"
+							minOccurs="0" type="categoryListComplexType">
+						</xs:element>
+						<xs:element name="conIcone" type="xs:boolean"
+							maxOccurs="1" minOccurs="0">
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+			<xs:element name="sfondo" maxOccurs="1" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="layerSfondoList" maxOccurs="1"
+							minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="layerSfondo"
+										type="layersSfondoComplexType" maxOccurs="unbounded"
+										minOccurs="1">
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+			<xs:element name="customQueryList" maxOccurs="1"
+				minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="customQuery"
+							maxOccurs="unbounded" minOccurs="1">
+							<xs:complexType>
+								<xs:all>
+									<xs:element name="nome"
+										type="xs:string" maxOccurs="1" minOccurs="1">
+									</xs:element>
+									<xs:element name="query"
+										type="xs:string" maxOccurs="1" minOccurs="0">
+									</xs:element>
+								</xs:all>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="printImageType" type="xs:string"
+				maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element name="printLayers" type="xs:string"
+				maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element name="printImageSize" type="xs:string"
+				maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element name="timeMachine" type="timeMachineType"
+				maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element name="tileStampaLarghezza" type="xs:int"
+				maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element name="tileStampaAltezza" type="xs:int"
+				maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element name="timeMachineList" maxOccurs="1"
+				minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="timeMachine"
+							type="timeMachineType" maxOccurs="unbounded" minOccurs="0">
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="opacity" type="xs:float" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Rappresenta l'opacità dei layer associati al server di default.
+Il valore deve variare da 0.0 (trasparente) a 1.0 (opaco).
+</xs:documentation>
+				</xs:annotation></xs:element>
+		</xs:all>
+	</xs:complexType>
+
+
+
+
+
+	<xs:complexType name="condizioneListComplexType">
+		<xs:sequence>
+			<xs:element name="condizione"
+				type="ParametriEventoCondizioneType" maxOccurs="unbounded"
+				minOccurs="0">
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="ParametriEventoCondizioneType">
+		<xs:sequence>
+			<xs:element name="codTPN" type="xs:int"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="customButtonComplexType">
+		<xs:all>
+			<xs:element minOccurs="1" maxOccurs="1"
+				name="idCustomButton" type="xs:int">
+			</xs:element>
+			<xs:element minOccurs="0" maxOccurs="1"
+				name="refreshAtTheEnd" type="xs:boolean">
+			</xs:element>
+			<xs:element minOccurs="1" maxOccurs="1" name="azioneList">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element minOccurs="1" maxOccurs="unbounded"
+							name="azione" type="EventoLayerBaseType">
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element minOccurs="0" maxOccurs="1"
+				name="condizioneList" type="condizioneListComplexType">
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<xs:complexType name="layersComplexType">
+        <xs:all>
+        	<xs:element name="name" type="xs:string"></xs:element>
+        	<xs:element name="codTPN" type="xs:int" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="defaultLayer" type="xs:boolean"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="hidden" type="xs:boolean" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="userSwitchable" type="xs:boolean"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="raster" type="xs:boolean" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="withOpacitySettings" type="xs:boolean"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="defaultStyle" type="xs:string"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="descrizione" type="xs:string"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="scalaMinima" type="xs:string"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="scalaMassima" type="xs:string"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="iconaLegenda" type="xs:string"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="extraLegendGraphPar" type="xs:string"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="serverID" type="xs:string" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="clickUrl" type="xs:string" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="clickTarget" type="xs:string"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="forceClickable" type="xs:boolean"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="stiliIndipDaScala" type="xs:boolean"
+        		maxOccurs="1" minOccurs="0">
+        	</xs:element>
+        	<xs:element name="toolTip" type="xs:string" maxOccurs="1"
+        		minOccurs="0">
+        	</xs:element>
+        	<xs:element name="expanded" type="xs:boolean" minOccurs="0"
+        		maxOccurs="1">
+        		<xs:annotation>
+        			<xs:documentation>
+        				booleano che specifica se il layer deve partire
+        				espanso mostrando le classi in una eventuale
+        				rappresentazione ad albero
+        			</xs:documentation>
+        		</xs:annotation>
+        	</xs:element>
+        	<xs:element name="opacity" type="xs:float" minOccurs="0"
+        		maxOccurs="1">
+        		<xs:annotation>
+        			<xs:documentation>
+        				Rappresenta l'opacità del layer corrente. Il
+        				valore deve variare da 0.0 (trasparente) a 1.0
+        				(opaco).
+        			</xs:documentation>
+        		</xs:annotation>
+        	</xs:element>
+        	<xs:element name="itemType" maxOccurs="1" minOccurs="0">
+        		<xs:annotation>
+        			<xs:documentation>
+        				indica il tipo di voce da mostrare in legenda.
+        				Valori possibili: - layer - separator - text
+        			</xs:documentation>
+        		</xs:annotation>
+        		<xs:simpleType>
+        			<xs:restriction base="xs:string">
+        				<xs:enumeration value="layer"></xs:enumeration>
+        				<xs:enumeration value="separator"></xs:enumeration>
+        				<xs:enumeration value="text"></xs:enumeration>
+        			</xs:restriction>
+        		</xs:simpleType>
+        	</xs:element>
+        	<xs:element name="itemIcon" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="autoLayer" maxOccurs="1" minOccurs="0">
+        		<xs:annotation>
+        			<xs:documentation>
+        				Se presente indica che il layer è del tipo
+        				&quot;autolayer&quot; cioè non è definito a
+        				livello di config tolomeo ma viene definito al
+        				volo.
+        			</xs:documentation>
+        		</xs:annotation>
+        		<xs:complexType>
+        			<xs:annotation>
+        				<xs:documentation>
+        					Informazioni di attivazione di unb layer
+        					automatico.
+        				</xs:documentation>
+        			</xs:annotation>
+        			<xs:all>
+        				<xs:element name="identifyAllowed"
+        					type="xs:boolean" maxOccurs="1" minOccurs="0">
+        					<xs:annotation>
+        						<xs:documentation>
+        							Indica che è attivata la
+        							funzionalità di identify.
+        						</xs:documentation>
+        					</xs:annotation>
+        				</xs:element>
+        				<xs:element name="autoIdentifyAllowed"
+        					type="xs:boolean" maxOccurs="1" minOccurs="0">
+        					<xs:annotation>
+        						<xs:documentation>
+        							Indica se attivare la funzionalità
+        							di autoIdentify.
+        						</xs:documentation>
+        					</xs:annotation>
+        				</xs:element>
+        				<xs:element name="autoIdentifyWithHighlight"
+        					type="xs:boolean" maxOccurs="1" minOccurs="0">
+        					<xs:annotation>
+        						<xs:documentation>
+        							Indica che la funzione di
+        							autoidentify evidenzia la geometria.
+        						</xs:documentation>
+        					</xs:annotation>
+        				</xs:element>
+        				<xs:element name="target" type="xs:string"
+        					maxOccurs="1" minOccurs="0">
+        					<xs:annotation>
+        						<xs:documentation>
+        							Target html sul quale aprire la
+        							pagina di identify.
+        						</xs:documentation>
+        					</xs:annotation>
+        				</xs:element>
+        				<xs:element name="defaultInfoFormat"
+        					type="xs:string" maxOccurs="1" minOccurs="0">
+        					<xs:annotation>
+        						<xs:documentation>
+        							Infoformat da utilizzare per la
+        							richiesta GetFeatureInfo.
+        						</xs:documentation>
+        					</xs:annotation>
+        				</xs:element>
+        				<xs:element name="regExpToCheckIfDataFound"
+        					type="xs:string" maxOccurs="1" minOccurs="0">
+        					<xs:annotation>
+        						<xs:documentation>
+        							Regular expression di cui cercare i
+        							match per verificare se si sono
+        							incrociate features in caso di
+        							defaultInfoFormat
+        							&quot;text/html&quot; o
+        							&quot;text/plain&quot;.
+        						</xs:documentation>
+        					</xs:annotation>
+        				</xs:element>
+        				<xs:element name="textToCheckIfDataFound"
+        					type="xs:string" maxOccurs="1" minOccurs="0">
+        					<xs:annotation>
+        						<xs:documentation>
+        							Testo da cercare per verificare se
+        							sono state incrociate features in
+        							caso di defaultInfoFormat
+        							&quot;text/html&quot; o
+        							&quot;text/plain&quot;.
+        						</xs:documentation>
+        					</xs:annotation>
+        				</xs:element>
+        				<xs:element name="espressioneDescrizione"
+        					type="xs:string" maxOccurs="1" minOccurs="0">
+        				</xs:element>
+        				<xs:element name="espressioneIDTPN"
+        					type="xs:string" maxOccurs="1" minOccurs="0">
+        				</xs:element>
+        				<xs:element name="autoVisOnSelect"
+        					type="xs:boolean" maxOccurs="1" minOccurs="0">
+        					<xs:annotation>
+        						<xs:documentation>
+        							Indica se attivare la funzionalità
+        							di autoVisOnSelect (visualizzazione
+        							identify non appena viene
+        							selezionato un oggetto
+        						</xs:documentation>
+        					</xs:annotation>
+        				</xs:element>
+        			</xs:all>
+
+        		</xs:complexType>
+        	</xs:element>
+        </xs:all>
+	</xs:complexType>
+
+	<xs:complexType name="timeMachineLayerListType">		
+		<xs:sequence>
+			<xs:element name="layer" type="TimeMachineLayerType"
+				maxOccurs="unbounded" minOccurs="1">
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="timeMachineType">
+		<xs:sequence>
+			<xs:element name="layerList" type="timeMachineLayerListType"
+				maxOccurs="1" minOccurs="1">
+			</xs:element>
+			<xs:element name="nome" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="TimeMachineLayerType">
+		<xs:all>
+			<xs:element name="tipo" type="xs:string" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="url" type="xs:string" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="styles" type="xs:string" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="mappa" type="xs:string" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="layer" type="xs:string" maxOccurs="1"
+				minOccurs="1">
+			</xs:element>
+			<xs:element name="formato" type="xs:string" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="srid" type="xs:string" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="testo" type="xs:string" maxOccurs="1"
+				minOccurs="1">
+			</xs:element>
+			<xs:element name="serverID" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+		</xs:all>
+	</xs:complexType>
+
+	<xs:complexType name="layersSfondoComplexType">
+		<xs:all>
+			<xs:element name="name" type="xs:string" minOccurs="1"
+				maxOccurs="1">
+			</xs:element>
+			<xs:element name="codTPN" type="xs:int" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="stile" type="xs:string" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="descrizione" type="xs:string"
+				maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element name="serverID" type="xs:string" maxOccurs="1"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="opacity" type="xs:float" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Rappresenta l'opacità del layer di sfondo corrente.
+Il valore deve variare da 0.0 (trasparente) a 1.0 (opaco).</xs:documentation>
+				</xs:annotation></xs:element>
+		</xs:all>
+	</xs:complexType>
+
+
+	<xs:complexType name="cswType">
+        <xs:all>
+        	<xs:element name="catalogList" type="catalogListType"
+        		minOccurs="1" maxOccurs="1">
+        	</xs:element>
+        	<xs:element name="cswVersion" type="xs:string" minOccurs="1"
+        		maxOccurs="1">
+        	</xs:element>
+        	<xs:element name="filterVersion" type="xs:string"
+        		minOccurs="1" maxOccurs="1">
+        	</xs:element>
+        	<xs:element name="limit" type="xs:int" minOccurs="0" maxOccurs="1"></xs:element>
+        	<xs:element name="timeout" type="xs:int" minOccurs="0" maxOccurs="1"></xs:element>
+        </xs:all>
+	</xs:complexType>
+
+	<xs:complexType name="catalogListType">
+		<xs:sequence minOccurs="1" maxOccurs="unbounded">
+			<xs:element name="catalog" type="catalogType"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="catalogType">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element name="url" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element name="description" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="categoryListComplexType">
+		<xs:sequence>
+			<xs:element minOccurs="1" maxOccurs="unbounded"
+				name="category">
+				<xs:complexType>
+					<xs:all>
+						<xs:element minOccurs="1" maxOccurs="1"
+							name="name" type="xs:string">
+						</xs:element>
+						<xs:element minOccurs="0" maxOccurs="1"
+							name="defaultCategory" type="xs:boolean">
+						</xs:element>
+						<xs:element name="hidden" type="xs:boolean"
+							maxOccurs="1" minOccurs="0">
+						</xs:element>
+						<xs:element name="userSwitchable"
+							type="xs:boolean" maxOccurs="1" minOccurs="0">
+						</xs:element>
+						<xs:element minOccurs="0" maxOccurs="1"
+							name="mutualExclusive" type="xs:boolean">
+						</xs:element>
+						<xs:element minOccurs="0" maxOccurs="1"
+							name="layerList">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element minOccurs="1"
+										maxOccurs="unbounded" name="layer" type="layersComplexType">
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="categoryList"
+							type="categoryListComplexType" maxOccurs="1" minOccurs="0">
+						</xs:element>
+						<xs:element name="clickUrl" type="xs:string"
+							maxOccurs="1" minOccurs="0">
+						</xs:element>
+						<xs:element name="clickTarget" type="xs:string"
+							maxOccurs="1" minOccurs="0">
+						</xs:element>
+						<xs:element name="toolTip" type="xs:string"
+							maxOccurs="1" minOccurs="0">
+						</xs:element>
+						<xs:element name="expanded" minOccurs="0"
+							maxOccurs="1" type="xs:boolean">
+							<xs:annotation>
+								<xs:documentation>
+									booleano che specifica se la
+									categoria deve partire espansa in
+									una eventuale rappresentazione ad
+									albero
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="itemType" maxOccurs="1"
+							minOccurs="0">
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="category"></xs:enumeration>
+									<xs:enumeration value="text"></xs:enumeration>
+									<xs:enumeration value="separator"></xs:enumeration>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="itemIcon"
+							type="xs:string" maxOccurs="1" minOccurs="0">
+						</xs:element>
+					</xs:all>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="serverPoolType">
+		<xs:sequence>
+			<xs:element name="serverList" maxOccurs="1" minOccurs="1">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="server"
+							maxOccurs="unbounded" minOccurs="1">
+                            <xs:complexType>
+                                <xs:all>
+                                	<xs:element name="nome"
+                                		type="xs:string" maxOccurs="1"
+                                		minOccurs="1">
+                                	</xs:element>
+                                	<xs:element name="typeDescription"
+                                		type="typeDescriptionType"
+                                		maxOccurs="1" minOccurs="1">
+                                	</xs:element>
+                                	<xs:element name="nomeCredenziale"
+                                		type="xs:string" maxOccurs="1"
+                                		minOccurs="0">
+                                	</xs:element>
+                                	<xs:element
+                                		name="allowServerConnection"
+                                		type="xs:boolean" maxOccurs="1"
+                                		minOccurs="0">
+                                	</xs:element>
+                                	<xs:element name="url"
+                                		type="xs:string" maxOccurs="1"
+                                		minOccurs="0">
+                                	</xs:element>
+                                	<xs:element name="id"
+                                		type="xs:string" maxOccurs="1"
+                                		minOccurs="1">
+                                	</xs:element>
+                                	<xs:element name="serverOpts"
+                                		type="xs:string" maxOccurs="1"
+                                		minOccurs="0">
+                                	</xs:element>
+                                	<xs:element name="tilesMultiple"
+                                		type="xs:boolean" maxOccurs="1"
+                                		minOccurs="0">
+                                	</xs:element>
+                                	<xs:element name="tileStampaAltezza"
+                                		type="xs:int" maxOccurs="1"
+                                		minOccurs="0">
+                                	</xs:element>
+                                	<xs:element
+                                		name="tileStampaLarghezza"
+                                		type="xs:int" maxOccurs="1"
+                                		minOccurs="0">
+                                	</xs:element>
+                                	<xs:element name="noTolomeoParams"
+                                		type="xs:boolean" maxOccurs="1"
+                                		minOccurs="0">
+                                	</xs:element>
+                                	<xs:element name="opacity"
+                                		type="xs:float" minOccurs="0"
+                                		maxOccurs="1">
+                                		<xs:annotation>
+                                			<xs:documentation>
+                                				Rappresenta l'opacità
+                                				dei layer associati al
+                                				server corrente. Il
+                                				valore deve variare da
+                                				0.0 (trasparente) a 1.0
+                                				(opaco).
+                                			</xs:documentation>
+                                		</xs:annotation>
+                                	</xs:element>
+                                	<xs:element name="showInWMSExplorer"
+                                		type="xs:boolean" maxOccurs="1" minOccurs="0">
+                                	</xs:element>
+                                </xs:all>
+                            </xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="typeDescriptionType">
+		<xs:restriction  base="xs:string">
+			<xs:enumeration value="Mapserver"></xs:enumeration>
+			<xs:enumeration value="Google Streets"></xs:enumeration>
+			<xs:enumeration value="Google Physical"></xs:enumeration>
+			<xs:enumeration value="Google Satellite"></xs:enumeration>
+			<xs:enumeration value="Google Hybrid"></xs:enumeration>
+			<xs:enumeration value="Yahoo Satellite"></xs:enumeration>
+			<xs:enumeration value="Yahoo Reg"></xs:enumeration>
+			<xs:enumeration value="Yahoo Hybrid"></xs:enumeration>
+			<xs:enumeration value="Bing Aerial"></xs:enumeration>
+			<xs:enumeration value="Bing Shaded"></xs:enumeration>
+			<xs:enumeration value="Bing Hybrid"></xs:enumeration>
+			<xs:enumeration value="WMS"></xs:enumeration>
+			<xs:enumeration value="OpenStreetMap"></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	
+
+
+	<xs:complexType name="WMSExplorerType">
+		<xs:all>
+			<xs:element name="serverWMSList" type="serverWMSListType"
+				maxOccurs="1" minOccurs="1">
+			</xs:element>
+            <xs:element name="includeMapServers" type="xs:boolean" maxOccurs="1" minOccurs="0">
+            	<xs:annotation>
+            		<xs:documentation>Indica se devono essere inclusi i server che compongono la mappa</xs:documentation>
+            	</xs:annotation>
+            </xs:element>
+        </xs:all>
+	</xs:complexType>
+
+	<xs:complexType name="serverWMSListType">
+		<xs:sequence>
+            <xs:element name="serverWMS" type="serverWMSType"
+				maxOccurs="unbounded" minOccurs="0">
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="serverWMSType">
+		<xs:all>
+			<xs:element name="url" type="xs:string"></xs:element>
+			<xs:element name="nome" type="xs:string"></xs:element>
+		</xs:all>
+	</xs:complexType>
+</xs:schema>

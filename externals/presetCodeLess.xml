@@ -5,54 +5,6 @@
 	<azioniApertura />
 	<azioniEventi>
 		<eventiLayerList>
-			<!-- eventiLayer>
-				<codTPN>1</codTPN>
-				<nomeLayer>stati_usa_plugin</nomeLayer>
-				<descrizioneLayer>Stati USA - Java Plugin WFS</descrizioneLayer>
-				<tipoGeometria>3</tipoGeometria>
-				<copertura>false</copertura>
-				<caricaLayerSeparato>false</caricaLayerSeparato>
-				<queryBuilder>true</queryBuilder>
-				<azioniEventiRicercaList>
-					<ricercaList>
-						<ricerca>
-							<idRicerca>1</idRicerca>
-						</ricerca>
-					</ricercaList>
-				</azioniEventiRicercaList>
-				<autoIdentifyAllowed>true</autoIdentifyAllowed>
-				<autoIdentifyWithHighlight>true</autoIdentifyWithHighlight>
-			</eventiLayer>
-			<eventiLayer>
-				<codTPN>2</codTPN>
-				<nomeLayer>stati_usa_spring</nomeLayer>
-				<descrizioneLayer>Stati USA - Spring WFS</descrizioneLayer>
-				<tipoGeometria>3</tipoGeometria>
-				<copertura>false</copertura>
-				<caricaLayerSeparato>false</caricaLayerSeparato>
-				<autoIdentifyAllowed>true</autoIdentifyAllowed>
-				<autoIdentifyWithHighlight>true</autoIdentifyWithHighlight>
-			</eventiLayer>
-			<eventiLayer>
-				<codTPN>3</codTPN>
-				<nomeLayer>stati_usa_wms</nomeLayer>
-				<descrizioneLayer>Stati USA - Spring WMS GetFeatureInfo</descrizioneLayer>
-				<tipoGeometria>3</tipoGeometria>
-				<copertura>false</copertura>
-				<caricaLayerSeparato>false</caricaLayerSeparato>
-				<autoIdentifyAllowed>true</autoIdentifyAllowed>
-				<autoIdentifyWithHighlight>true</autoIdentifyWithHighlight>
-				<azioniEventiVis>
-					<azioneList>
-						<azione>
-							<ajaxCall>false</ajaxCall>
-							<target>pannello</target>
-							<useWMSGetFeatureInfo>true</useWMSGetFeatureInfo>
-						</azione>
-					</azioneList>
-					<autoVisOnSelect>true</autoVisOnSelect>
-				</azioniEventiVis>
-			</eventiLayer-->
 			<eventiLayer>
 				<codTPN>1</codTPN>
 				<nomeLayer>stati_usa_plugin</nomeLayer>
@@ -72,17 +24,15 @@
 				<azioniEventiVis>
 	  				<azioneList>
 	  					<azione>
-	  						<ajaxCall>true</ajaxCall>
-	  						<url>/tolomeobinj/LayerItemServlet</url>
-	  						<target>formCodeless</target>
-	  						<command>view</command>
+	  						<codeless>true</codeless>
 	  					</azione>
 	  				</azioneList>
 	  			</azioniEventiVis>
 	  			<!-- Azione di cancellazione -->
 	  			<azioniEventiCanc>
 	  				<azioneList>
-	  					<azione>
+	  	  				<azione>
+	  	  					<codeless>true</codeless>
 	  					</azione>
 	  				</azioneList>
 	  			</azioniEventiCanc>
@@ -90,17 +40,16 @@
 	  			<azioniEventiIns>
 	  				<azioneList>
 	  					<azione>
-	  						<ajaxCall>true</ajaxCall>
-	  						<url>/tolomeobinj/LayerItemServlet</url>
-	  						<target>formCodeless</target>
-	  						<command>new</command>
+	  						<codeless>true</codeless>
 	  					</azione>
 	  				</azioneList>
 	  			</azioniEventiIns> 
 	  			<!-- Azione di modifica -->
 	  			<azioniEventiUpdateAlpha>
 	  				<azioneList>
-	  					<azione></azione>
+	  					<azione>
+	  						<codeless>true</codeless>
+	  					</azione>
 	  				</azioneList>
 	  			</azioniEventiUpdateAlpha> 
 				<autoIdentifyAllowed>true</autoIdentifyAllowed>
@@ -152,26 +101,6 @@
 						<category>
 							<name>Stati Uniti</name>
 							<layerList>
-								<!-- layer>
-									<expanded>true</expanded>
-									<name>topp:states</name>
-									<descrizione>Stati USA - Java Plugin WFS</descrizione>
-									<codTPN>1</codTPN>
-								</layer>
-								<layer>
-									<name>topp:states</name>
-									<codTPN>2</codTPN>
-									<defaultStyle>polygon</defaultStyle>
-									<descrizione>Stati USA - Spring WFS</descrizione>
-									<expanded>true</expanded>
-								</layer>
-								<layer>
-									<name>topp:states</name>
-									<codTPN>3</codTPN>
-									<defaultStyle>polygon</defaultStyle>
-									<descrizione>Stati USA - Spring WMS GetFeatureInfo</descrizione>
-									<expanded>true</expanded>
-								</layer-->
 								<layer>
 									<expanded>true</expanded>
 									<name>it.geosolutions:states</name>

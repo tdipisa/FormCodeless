@@ -127,6 +127,10 @@ public class LayerItemServlet extends TolomeoServlet {
         String idTPN = request.getParameter("IDTPN");
         String data = request.getParameter("data");
         
+        // Used only to create a new feature
+        String wkt = request.getParameter("geometry");
+        String srid = request.getParameter("SRID");
+        
         logger.debug("LayerItemServlet codTPN: " + codTPN);
         
         SITLayersManager comunePO = null;
@@ -146,7 +150,7 @@ public class LayerItemServlet extends TolomeoServlet {
 	        		JSONArray view = this.buildOutputConfiguration(idTPN, layer, layerAttributeNames, false);
 	        		responseObj = SITExtStore.extStore(view, null);
 	        	}else if(mode.equals("edit")){
-	        		responseObj = this.buildEditResponse(layer, idTPN);
+        			responseObj = this.buildEditResponse(layer, idTPN);
 	        	}else if(mode.equals("update")){
 	        		JSONArray values = JSONArray.fromObject(data);
 	        		
@@ -162,6 +166,28 @@ public class LayerItemServlet extends TolomeoServlet {
 	        		layer.modifyFeature(feature);
 	        		
 	        		responseObj = this.buildEditResponse(layer, idTPN);
+	        	}else if(mode.equals("delete")){
+		        	OggettoTerritorio feature = layer.cercaIDTPN(idTPN);
+		        	layer.removeFeature(feature);
+		        	
+		        	responseObj = SITExtStore.extStoreFromString("Cancellazione della feature avvenuta con successo.");
+	        	}else if(mode.equals("new")){
+	        		JSONArray values = JSONArray.fromObject(data);
+	        		
+	        		OggettoTerritorio feature = layer.creaNuovoOggettoTerritorio();
+	        		
+	        		int size = values.size();
+	        		for(int i=0; i<size; i++){
+	        			JSONObject attribute = (JSONObject)values.get(i);
+	        			
+	        			feature.setAttributeByNL((String)attribute.get("nl"), attribute.get("value"));
+	        		}
+	        		
+	        		feature.setGeometryAttributeWKT(wkt);
+	        		
+	        		layer.appendFeature(feature);
+	        		
+	        		responseObj = this.buildEditResponse(layer, idTPN);
 	        	}
 	        	
         		responseObj.put("security", "all");
@@ -181,7 +207,6 @@ public class LayerItemServlet extends TolomeoServlet {
         	resp = new ExtStoreError(errMsg, null).toJSONString();
             logger.error(errMsg);
 		} finally {        	
-                
             if(comunePO != null){
                 try {
                     comunePO.dispose();
@@ -195,73 +220,15 @@ public class LayerItemServlet extends TolomeoServlet {
         }
     }
 	
-    /* (non-Javadoc)
-	 * @see javax.servlet.http.HttpServlet#doDelete(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	/**
+	 * @param view
+	 * @return JSONObject
 	 */
-	@Override
-	protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		
-		// Recupero il logger
-        LogInterface logger = getLogger(request);
-        
-        // Recupero i parametri
-        Integer codTPN = getCodTPN(request);
-        String mode = request.getParameter("command");
-        String idTPN = request.getParameter("IDTPN");
-        
-        logger.debug("LayerItemServlet.delete codTPN: " + codTPN);
-        
-        SITLayersManager comunePO = null;
-        String resp     = null;
-        
-        try {
-        	// Recupero l'oggetto Territorio
-        	comunePO = getTerritorio(logger);
-	        // Recupero il layer identificato da codTPN
-	        LayerTerritorio layer = comunePO.getLayerByCodTPN(codTPN);
-	        
-	        if (layer != null) {
-	        	JSONObject responseObj = null;
-	        	
-	        	if(mode.equals("delete")){
-		        	OggettoTerritorio feature = layer.cercaIDTPN(idTPN);
-		        	layer.removeFeature(feature);
-		        	
-		        	responseObj = SITExtStore.extStoreFromString("Cancellazione della feature avvenuta con successo.");
-	        	}
-	        	
-        		responseObj.put("security", "all");
-	        	resp = responseObj.toString();
-	        	
-	        } else {
-	        	String errMsg = "Il layer con codice " + codTPN + " è nullo";
-	        	resp = new ExtStoreError(errMsg,null).toJSONString();
-	            logger.error(errMsg);
-	        }
-        } catch (SITException e) {
-        	String errMsg = e.getMessage();
-        	resp = new ExtStoreError(errMsg, null).toJSONString();
-            logger.error(errMsg);
-		} catch (SQLException e) {
-        	String errMsg = e.getMessage();
-        	resp = new ExtStoreError(errMsg, null).toJSONString();
-            logger.error(errMsg);
-		} finally {        	
-                
-            if(comunePO != null){
-                try {
-                    comunePO.dispose();
-                } catch (SITException e) {
-                    logger.error("Impossibile fare il dispose del LayersManager",e);
-                }
-            }
-            
-            request.setAttribute("geometry", resp);
-            forward(request, response);
-        }
+	private JSONObject buildExtStore(JSONArray view){
+		JSONObject responseObj = SITExtStore.extStore(view, null);
+		return responseObj;
 	}
-    
+	  
     /**
      * @param layer
      * @param idTPN
@@ -271,11 +238,11 @@ public class LayerItemServlet extends TolomeoServlet {
     private JSONObject buildEditResponse(LayerTerritorio layer, String idTPN) throws SITException{
 		HashMap<String, String> layerAttributeNames = layer.getNomiCampiScrittura();
 		JSONArray view = this.buildOutputConfiguration(idTPN, layer, layerAttributeNames, true);
-		JSONObject responseObj = SITExtStore.extStore(view, null);
+		JSONObject responseObj = this.buildExtStore(view);
 		
 		return responseObj;
     }
-    
+       
     /**
      * Restituisce la configurazione di output per la form codeless.
      * 
@@ -291,7 +258,12 @@ public class LayerItemServlet extends TolomeoServlet {
     	
     	HashMap<String, String> layerAttributeNamesReadable = layer.getNomiCampiLegibili();
     	
+    	// //////////////////////////////////////////////
+    	// Feature could be null if we are trying to 
+    	// create a new object (idTPN=null).
+    	// //////////////////////////////////////////////
 		OggettoTerritorio feature = layer.cercaIDTPN(idTPN);
+		boolean newFeature = feature == null;
 		
     	HashMap<String, Class<?>> layerAttributeTypes = null;
  
@@ -302,6 +274,9 @@ public class LayerItemServlet extends TolomeoServlet {
 		
 		JSONArray view = new JSONArray();
 		
+		// //////////////////////////////////////////////////////
+		// Not editable record only to present the layer name.
+		// //////////////////////////////////////////////////////
 		JSONObject levelName = new JSONObject();
 		levelName.put("name", "Livello");
 		levelName.put("nl", "");
@@ -311,22 +286,29 @@ public class LayerItemServlet extends TolomeoServlet {
 		
 		view.add(levelName);
 		
+		// ///////////////////////////////
+		// Fill records for attributes
+		// ///////////////////////////////
 		while(iterator.hasNext()){
 			String key = (String)iterator.next();
 			
 			String nr = layerAttributeNamesReadable.get(key);
 			String nl = layerAttributeNames.get(key);
 			
-			JSONObject attribute = new JSONObject();
-			attribute.put("name", nr != null ? nr : nl);
-			attribute.put("nl", key);
-			attribute.put("value", feature.getAttributeByNL(key));
-			attribute.put("type", layerAttributeTypes.get(key));
-			
-			boolean edit = key.equals("NL_IDTPN") ? false : editable;        			
-			attribute.put("editable", edit);
-			
-			view.add(attribute);
+			if(newFeature && key.equals("NL_IDTPN")){
+				continue;
+			}else{
+				JSONObject attribute = new JSONObject();
+				attribute.put("name", nr != null ? nr : nl);
+				attribute.put("nl", key);
+				attribute.put("value", feature != null ? feature.getAttributeByNL(key) : "");
+				attribute.put("type", layerAttributeTypes.get(key));
+				
+				boolean edit = key.equals("NL_IDTPN") ? false : editable;        			
+				attribute.put("editable", edit);
+				
+				view.add(attribute);
+			}
 		}
 		
 		return view;
