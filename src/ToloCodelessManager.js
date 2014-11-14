@@ -272,7 +272,18 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
 				// ////////////////////////////////////////////////////////
 				this.currentGeoOp = undefined;
 				
-				this.setMode("edit", store);
+				// ///////////////////////////////////////////////////////
+				// Check if we are trying to create a new element or not
+				// ///////////////////////////////////////////////////////
+				var record = store.findRecord("nl", "NL_IDTPN");
+				var recordValue = record.get("value");
+				
+				var mode = "edit";
+				if(recordValue == ""){
+					mode = "new";
+				}
+				
+				this.setMode(mode, store);
     			this.fireEvent("loaddata", store);
     		},
     		this.doAjaxFailure,

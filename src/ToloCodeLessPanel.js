@@ -54,6 +54,11 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 	 * @property {Ext.grid.Panel} propertyGrid
 	 * Griglia ExtJs per la presentazione e la modifica dei dati richiesti.
 	 */
+	
+	/**
+	 * @property {String} mode
+	 * Stringa che indica la modalità di funzionamento corrente della form.
+	 */
 
 	/**
      * Inizializza un nuovo TolomeoExt.ToloCodeLessPanel.
@@ -101,6 +106,11 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
             	  header: 'Editabile',  
             	  dataIndex: 'editable',
                   hidden: true
+              },
+              {
+            	  header: 'Validation',  
+            	  dataIndex: 'validation',
+                  hidden: true
               }, 
               {
             	  header: 'Valore', 
@@ -111,34 +121,57 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
             		  	if(editable){
                 		    var type = record.get("type");
                 		    
+                		    // ///////////////////////////////////////////////////////
+                		    // Set the field's validation rules using the retrieved 
+                		    // Regular Expression if any.
+                		    // ///////////////////////////////////////////////////////
+                		    var validation = record.get("validation");
+                		    var baseConfig = {};
+                		    if(validation != "undefined"){
+                		    	var valueTest = new RegExp(validation);
+                		    	baseConfig = {
+    	                            validator: function(value) {
+    	                                return valueTest.test(value) ? true : "Valore campo non valido";
+    	                            }
+    	                		}
+                		    }
+                		    
     	  	                switch (type) {
     		                    case "java.util.Date":
     		                    case "java.util.Calendar":
+    		                		var config = Ext.apply({
+		            		            allowBlank: false,
+		            		        }, baseConfig);
+    		                		
     		            		    return Ext.create('Ext.grid.CellEditor', { 
-    		            		        field: Ext.create('Ext.form.field.Date', {
-    		            		            allowBlank: false
-    		            		        })
+    		            		        field: Ext.create('Ext.form.field.Date', config)
     		            		    });
     		                        break;
     		                    case "java.lang.Boolean":
+    		                		var config = Ext.apply({
+		            		            allowBlank: false,
+		            		        }, baseConfig);
+    		                		
     		            		    return Ext.create('Ext.grid.CellEditor', { 
-    		            		        field: Ext.create('Ext.form.field.Checkbox', {
-    		            		            allowBlank: false
-    		            		        })
+    		            		        field: Ext.create('Ext.form.field.Checkbox', config)
     		            		    });
     		                        break;
     		                    case "java.lang.String":
+    		                		var config = Ext.apply({
+		            		            allowBlank: false,
+		            		        }, baseConfig);
+    		                		
     		            		    return Ext.create('Ext.grid.CellEditor', { 
-    		            		        field: Ext.create('Ext.form.field.Text', {
-    		            		            allowBlank: false
-    		            		        })
+    		            		        field: Ext.create('Ext.form.field.Text', config)
     		            		    });
     		                        break;
     		                    default:
+    		                		var config = Ext.apply({
+		            		            allowBlank: false,
+		            		        }, baseConfig);
+    		                    
     		            		    return Ext.create('Ext.grid.CellEditor', { 
-    		            		        field: Ext.create('Ext.form.field.Number', {
-    		            		            allowBlank: false
-    		            		        })
+    		            		        field: Ext.create('Ext.form.field.Number', config)
     		            		    });
     		                }
             		  	}
@@ -216,10 +249,10 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 	    				'Procedere con il salvataggio?', 
 	    				function(btn){
 		    			   if(btn === 'yes'){
-		    				   var store = this.propertyGrid.getStore();
-		    				   var record = store.findRecord("nl", "NL_IDTPN");
+//		    				   var store = this.propertyGrid.getStore();
+//		    				   var record = store.findRecord("nl", "NL_IDTPN");
 		    				   
-		    				   if(record == null){
+		    				   if(this.mode == "new"){
 		    					   this.codelessManager.create();
 		    				   }else{
 		    					   this.codelessManager.update();
@@ -289,6 +322,8 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
      * @param {Ext.Data.Store} store Store con gui configurare la griglia dei dati
      */
 	setFormMode: function(mode, store){
+		this.mode = mode;
+		
 		if(mode == "view"){
 			this.fieldSet.setTitle(this.viewFieldSetTitle);	
 			this.setBtnVisibility(false);

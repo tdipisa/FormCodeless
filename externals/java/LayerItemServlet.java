@@ -118,10 +118,10 @@ public class LayerItemServlet extends TolomeoServlet {
 	@Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         
-    	// Recupero il logger
+    	// Get the logger
         LogInterface logger = getLogger(request);
         
-        // Recupero i parametri
+        // Get parameters
         Integer codTPN = getCodTPN(request);
         String mode = request.getParameter("command");
         String idTPN = request.getParameter("IDTPN");
@@ -137,21 +137,30 @@ public class LayerItemServlet extends TolomeoServlet {
         String resp     = null;
         
         try {
-        	// Recupero l'oggetto Territorio
+        	// Get the Oggetto Territorio
         	comunePO = getTerritorio(logger);
-	        // Recupero il layer identificato da codTPN
+	        // Get the layer identified by codTPN
 	        LayerTerritorio layer = comunePO.getLayerByCodTPN(codTPN);
 	        
 	        if (layer != null) {
 	        	JSONObject responseObj = null;
 	        	
 	        	if(mode.equals("view")){
+	        		// /////////////////////////////////////////////////////////
+	        		// READ MODE: This mode get the presentation configuration
+	        		// /////////////////////////////////////////////////////////
 	        		HashMap<String, String> layerAttributeNames = layer.getNomiCampi();
 	        		JSONArray view = this.buildOutputConfiguration(idTPN, layer, layerAttributeNames, false);
 	        		responseObj = SITExtStore.extStore(view, null);
 	        	}else if(mode.equals("edit")){
+	        		// /////////////////////////////////////////////////
+	        		// EDIT MODE: This mode get the edit configuration
+	        		// /////////////////////////////////////////////////
         			responseObj = this.buildEditResponse(layer, idTPN);
 	        	}else if(mode.equals("update")){
+	        		// ///////////////////////////////////////////////////////
+	        		// UPDATE MODE: This mode updates data sent by the client
+	        		// ///////////////////////////////////////////////////////
 	        		JSONArray values = JSONArray.fromObject(data);
 	        		
 	        		OggettoTerritorio feature = layer.cercaIDTPN(idTPN);
@@ -167,11 +176,17 @@ public class LayerItemServlet extends TolomeoServlet {
 	        		
 	        		responseObj = this.buildEditResponse(layer, idTPN);
 	        	}else if(mode.equals("delete")){
+	        		// /////////////////////////////////////////////////////////////////////////////
+	        		// DELETE MODE: This mode delete a feature using the ID specified by the client
+	        		// /////////////////////////////////////////////////////////////////////////////
 		        	OggettoTerritorio feature = layer.cercaIDTPN(idTPN);
 		        	layer.removeFeature(feature);
 		        	
 		        	responseObj = SITExtStore.extStoreFromString("Cancellazione della feature avvenuta con successo.");
 	        	}else if(mode.equals("new")){
+	        		// ////////////////////////////////////////////////////////
+	        		// CREATE MODE: this mode creates a new object (feature) 
+	        		// ////////////////////////////////////////////////////////
 	        		JSONArray values = JSONArray.fromObject(data);
 	        		
 	        		OggettoTerritorio feature = layer.creaNuovoOggettoTerritorio();
@@ -179,6 +194,11 @@ public class LayerItemServlet extends TolomeoServlet {
 	        		int size = values.size();
 	        		for(int i=0; i<size; i++){
 	        			JSONObject attribute = (JSONObject)values.get(i);
+	        			
+	        			String property = (String)attribute.get("nl");
+	        			if(property.equals("NL_IDTPN")){
+	        				idTPN = (String)attribute.get("value");
+	        			}
 	        			
 	        			feature.setAttributeByNL((String)attribute.get("nl"), attribute.get("value"));
 	        		}
@@ -221,6 +241,8 @@ public class LayerItemServlet extends TolomeoServlet {
     }
 	
 	/**
+	 * Restituisce lo store finale dei dati da fornire al client.
+	 * 
 	 * @param view
 	 * @return JSONObject
 	 */
@@ -230,6 +252,8 @@ public class LayerItemServlet extends TolomeoServlet {
 	}
 	  
     /**
+     * Compone la richiesta per la modalità di 'edit'.
+     * 
      * @param layer
      * @param idTPN
      * @return JSONObject
@@ -257,6 +281,8 @@ public class LayerItemServlet extends TolomeoServlet {
     		HashMap<String, String> layerAttributeNames, boolean editable) throws SITException{
     	
     	HashMap<String, String> layerAttributeNamesReadable = layer.getNomiCampiLegibili();
+    	HashMap<String, Class<?>> layerAttributeTypes = layer.getAttributiTipo();
+    	HashMap<String, String> layerAttributeRegEx = layer.getAttributiRegEx();
     	
     	// //////////////////////////////////////////////
     	// Feature could be null if we are trying to 
@@ -265,10 +291,6 @@ public class LayerItemServlet extends TolomeoServlet {
 		OggettoTerritorio feature = layer.cercaIDTPN(idTPN);
 		boolean newFeature = feature == null;
 		
-    	HashMap<String, Class<?>> layerAttributeTypes = null;
- 
-    	layerAttributeTypes = layer.getAttributiTipo();
-    	
 		Set<String> keys = layerAttributeNames.keySet();
 		Iterator<String> iterator = keys.iterator();
 		
@@ -283,6 +305,7 @@ public class LayerItemServlet extends TolomeoServlet {
 		levelName.put("value", layer.getNome());
 		levelName.put("type", layer.getNome().getClass());
 		levelName.put("editable", false);
+		levelName.put("validation", "undefined");
 		
 		view.add(levelName);
 		
@@ -295,20 +318,39 @@ public class LayerItemServlet extends TolomeoServlet {
 			String nr = layerAttributeNamesReadable.get(key);
 			String nl = layerAttributeNames.get(key);
 			
-			if(newFeature && key.equals("NL_IDTPN")){
-				continue;
+			String validation = layerAttributeRegEx.get(key); 
+			
+			JSONObject attribute = new JSONObject();
+			attribute.put("name", nr != null ? nr : nl);
+			attribute.put("nl", key);
+			attribute.put("value", !newFeature ? feature.getAttributeByNL(key) : "");
+			attribute.put("type", layerAttributeTypes.get(key));
+			attribute.put("validation", validation != null ? validation : "undefined");
+			
+			// In 'edit' or 'new' modes by default the field is editable 
+			boolean edit = editable;
+			if(!newFeature && key.equals("NL_IDTPN")){
+				// //////////////////////////////////////////////////
+				// In edit mode the IDTPN should not be editable 
+				// //////////////////////////////////////////////////
+				edit = false;
 			}else{
-				JSONObject attribute = new JSONObject();
-				attribute.put("name", nr != null ? nr : nl);
-				attribute.put("nl", key);
-				attribute.put("value", feature != null ? feature.getAttributeByNL(key) : "");
-				attribute.put("type", layerAttributeTypes.get(key));
-				
-				boolean edit = key.equals("NL_IDTPN") ? false : editable;        			
-				attribute.put("editable", edit);
-				
-				view.add(attribute);
+				// ///////////////////////////////////////////////////////////
+				// For a new feature or not the field should be editable only 
+				// if specified in configuration (config.txt on Spring).
+				// ///////////////////////////////////////////////////////////
+				HashMap<String, String> nomiCampiRW = layer.getAttributiReadWrite();
+				if(nomiCampiRW != null && nomiCampiRW.get(key) != null){
+					// We have to check if we are in 'view' mode or not before setting the flag.
+					edit = editable ? true : false;
+				}else{
+					edit = false;
+				}
 			}
+			
+			attribute.put("editable", edit);
+			
+			view.add(attribute);
 		}
 		
 		return view;
@@ -318,4 +360,5 @@ public class LayerItemServlet extends TolomeoServlet {
     protected String getDefaultForward() {
         return "/jsp/tolomeoAjaxQuery.jsp";
     }
+    
 }

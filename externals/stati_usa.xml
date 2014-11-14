@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util 
+		http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+	<bean id="stati_usa" class="it.prato.comune.sit.LayerTerritorioGenerico">
+		<constructor-arg value="2" /><!-- codTPN -->
+		<constructor-arg value="Stati USA" /><!-- nome -->
+		<constructor-arg ref="logger1" /><!-- logger -->
+		
+		<property name="layerConfig">
+			<bean class="it.prato.comune.sit.ConfigLayerBean">
+				<property name="dsPoolID" value="1" /><!-- ID datastore definito su config.txt -->
+				<property name="typeName" value="states" /><!-- nome tabella in caso si punti a DB o nome layer WFS -->
+			</bean>
+		</property>
+		
+		<!-- metodo che definisce l'elenco dei campi -->
+		<property name="elencoCampi">
+			<util:map map-class="java.util.HashMap">
+				<entry key="NL_IDTPN" value="state_fips" />
+				<entry key="NL_STATE_NAME" value="state_name" />
+				<entry key="NL_STATE_ABBR" value="state_abbr" />
+				<entry key="NL_STATE_PERS" value="persons" />
+			</util:map>
+		</property>
+		
+		<property name="elencoCampiLeggibili">
+			<util:map map-class="java.util.HashMap">
+				<entry key="NL_STATE_NAME" value="NOME STATO" />
+				<entry key="NL_STATE_ABBR" value="NOME ABBREVIATO" />
+				<entry key="NL_STATE_PERS" value="POPOLAZIONE" />
+			</util:map>
+		</property>
+		
+		<property name="elencoCampiRegEx">
+			<util:map map-class="java.util.HashMap">
+				<entry key="NL_STATE_NAME" value="[a-zA-Z0-9]" />
+				<entry key="NL_STATE_ABBR" value="[A-Z]" />
+				<entry key="NL_STATE_PERS" value="[0-9]*" />
+			</util:map>
+		</property>
+		
+		<property name="elencoCampiReadWrite">
+			<util:map map-class="java.util.HashMap">
+				<entry key="NL_IDTPN" value="state_fips" />
+			</util:map>
+		</property>
+
+		<!-- metodo che setta la descrione degli oggetti del layer -->
+		<property name="espressioneDescrizione">
+			<value>
+				<![CDATA[
+				attributes.get("NL_STATE_NAME");
+				]]></value>
+		</property>
+	</bean>
+</beans>

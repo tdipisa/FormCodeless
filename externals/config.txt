@@ -75,6 +75,16 @@
 001STATESRE_NAME=[a-zA-Z0-9]
 001STATESRE_ABBR=[A-Z]
 001STATESRE_PERS=[0-9]*
+## --------------------------------------------------- ##
+## The RW_ (Read/Write) is used in order to establish  ##
+## is the field should be editable or not              ##
+## If you don't specify this for IDTPN we assume that  ##
+## this field will be filled by the servlet or the DB  ##
+## --------------------------------------------------- ##
+001STATESRW_IDTPN=state_fips
+#001STATESRW_NAME=state_name
+001STATESRW_ABBR=state_abbr
+001STATESRW_PERS=persons
 
 # Layer states - Datastore shape file
 #001STATESCODTPN=1
