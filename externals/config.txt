@@ -36,17 +36,22 @@
 #001DSPOOLDATASTORECASESENSITIVE1=I
 
 # DataStore PostGis
-001DSPOOLDATASTOREPAR1=dbtype;postgis!!user;postgres!!passwd;postgres!!host;localhost!!port;5432!!database;states
+001DSPOOLDATASTOREPAR1=true!!dbtype;postgis!!user;postgres!!passwd;postgres!!host;localhost!!port;5432!!database;states
 001DSPOOLDATASTOREFACTORY1=org.geotools.data.postgis.PostgisNGDataStoreFactory
 001DSPOOLDATASTORECONHINTS1=N
 001DSPOOLDATASTORECASESENSITIVE1=I
+
+# DataStore PostGis 2
+001DSPOOLDATASTOREPAR2=Expose primary keys;true!!dbtype;postgis!!user;postgres!!passwd;postgres!!host;localhost!!port;5432!!database;states
+001DSPOOLDATASTOREFACTORY2=org.geotools.data.postgis.PostgisNGDataStoreFactory
+001DSPOOLDATASTORECONHINTS2=N
+001DSPOOLDATASTORECASESENSITIVE2=I
 
 # DataStore PostGis con chiave primaria esposta
 #001DSPOOLDATASTOREPAR3=Expose primary keys;true!!dbtype;postgis!!user;postgis!!passwd;postgis!!host;testpg!!port;5433!!database;mydatabase
 #001DSPOOLDATASTOREFACTORY3=org.geotools.data.postgis.PostgisNGDataStoreFactory
 #001DSPOOLDATASTORECONHINTS3=N
 #001DSPOOLDATASTORECASESENSITIVE3=I
-
 
 ############################################################
 # Definizione layers
@@ -69,22 +74,48 @@
 001STATESNL_NAME=state_name
 001STATESNL_ABBR=state_abbr
 001STATESNL_PERS=persons
-001STATESUR_NAME=NOME STATO
-001STATESUR_ABBR=NOME ABBREVIATO
-001STATESUR_PERS=POPOLAZIONE
+001STATESNL_UPP=update_timestamp
+001STATESNL_CONTINENTFK=continent_fk
+001STATESHR_NAME=NOME STATO
+001STATESHR_ABBR=NOME ABBREVIATO
+001STATESHR_PERS=POPOLAZIONE
+001STATESHR_UPP=AGGIORNAMENTO
+001STATESHR_CONTINENTFK=NOME CONTINENTE
 001STATESRE_NAME=[a-zA-Z0-9]
 001STATESRE_ABBR=[A-Z]
 001STATESRE_PERS=[0-9]*
+001STATESRE_UPP=[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}\:[0-9]{2}\:[0-9]{2}
 ## --------------------------------------------------- ##
 ## The RW_ (Read/Write) is used in order to establish  ##
-## is the field should be editable or not              ##
+## if the field should be editable or not              ##
 ## If you don't specify this for IDTPN we assume that  ##
-## this field will be filled by the servlet or the DB  ##
+## this field will be calculated by the servlet or     ##
+## the DB                                              ##
 ## --------------------------------------------------- ##
 001STATESRW_IDTPN=state_fips
 #001STATESRW_NAME=state_name
 001STATESRW_ABBR=state_abbr
 001STATESRW_PERS=persons
+001STATESRW_UPP=update_timestamp
+001STATESRW_CONTINENTFK=continent_fk
+## ---------------------------------------------- ##
+## Allows to specify all FK for the feature type  ## 
+## using the pattern: NL_FK=k1:d1:a1;k2:d2:a2;... ##
+## ---------------------------------------------- ##
+001STATESFT_FK=NL_CONTINENTFK:2:NL_CONTINENTNAME
+
+
+# Continents - Datastore tabella PostGis
+001CONTINENTSCODTPN=2
+001CONTINENTSNOMELAYER=Continents
+001CONTINENTSDSPOOLID=2
+001CONTINENTSTYPENAME=continents
+# Chiave primaria gestita dai GT
+#001CONTINENTSNL_IDTPN=##FID##
+# Chieve primaria gestita dall'applicazione (necessario datastore con PK esposta)
+001CONTINENTSNL_IDTPN=continent_fips
+001CONTINENTSNL_CONTINENTNAME=continent_name
+
 
 # Layer states - Datastore shape file
 #001STATESCODTPN=1
@@ -104,6 +135,7 @@
 #001STATESRE_NAME=[a-zA-Z0-9]
 #001STATESRE_ABBR=[A-Z]
 #001STATESRE_PERS=[0-9]*
+
 
 # Layer states - Datastore WFS
 #001STATESCODTPN=1

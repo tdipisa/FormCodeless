@@ -46,6 +46,54 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 	newFieldSetTitle: "Nuovo Elemento",
 	
 	/**
+	 * @cfg {String} applyModsTooltip
+	 * Testo da mostrare per il tootlip del pulsante di salvataggio delle modifiche.
+	 */
+	applyModsTooltip: "Applica Modifiche",
+	
+	/**
+	 * @cfg {String} resetTooltip
+	 * Testo da mostrare per il tootlip del pulsante di reset delle modifiche.
+	 */
+	resetTooltip: "Reimposta Campi",
+	
+	/**
+	 * @cfg {String} restoreBoxTitle
+	 * Titolo da mostrare per la dialog di conferma per il reset delle modiche.
+	 */
+	restoreBoxTitle: "Ripristino", 
+	
+	/**
+	 * @cfg {String} restoreBoxText
+	 * Testo da mostrare per la dialog di conferma per il reset delle modiche.
+	 */
+	restoreBoxText: "Procedere con il ripristoni dei dati allo stato iniziale?", 
+
+	/**
+	 * @cfg {String} saveBoxTitle
+	 * Titolo da mostrare per la dialog di conferma per il salvataggio delle modiche.
+	 */
+	saveBoxTitle: "Salvataggio", 
+	
+	/**
+	 * @cfg {String} saveBoxText
+	 * Testo da mostrare per la dialog di conferma per il salvataggio delle modiche.
+	 */
+	saveBoxText: "Procedere con il salvataggio?", 
+	
+	/**
+     * @cfg {Object} autoCompleteCfg [autoCompleteCfg="{}"]
+	 * Stabilisce la configurazione da usare per la funzionalità di autocompletamento.
+	 *
+	 * @example
+	 * autoCompleteCfg: {
+	 *  	url: 'http://localhost:8080/tolomeobinj/UniqueValueServlet',
+	 *		pageSize: 10
+	 * }
+     */
+    autoCompleteCfg: {},
+	
+	/**
 	 * @property {TolomeoExt.ToloCodelessManager} codelessManager
 	 * Gestore delle operazioni del componente.
 	 */
@@ -53,6 +101,11 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 	/**
 	 * @property {Ext.grid.Panel} propertyGrid
 	 * Griglia ExtJs per la presentazione e la modifica dei dati richiesti.
+	 */
+	
+	/**
+	 * @property {Ext.grid.Panel} decodeGrid
+	 * Griglia ExtJs per la presentazione e la modifica dei dati relativi alle tabelle di decodifica.
 	 */
 	
 	/**
@@ -67,8 +120,12 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 	initComponent: function(config){
 		TolomeoExt.Vars.ApplyIfDefaults(this);
 		
+		// ///////////////////// //
+		// FEATURE DI SELEZIONE  //
+		// ///////////////////// //
+		
 		var gridStore = Ext.create('Ext.data.Store', {
-		    fields: ["name", "value"],
+		    fields: ["name", "nl", "type", "editable", "validation", "value", "format"],
 		    proxy: {
 		        type: 'memory',
 		        reader: {
@@ -83,6 +140,7 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 	        autoCancel: false
 	    });
 	    
+	    var me = this;
 		this.propertyGrid = Ext.create('Ext.grid.Panel', {
 			margin: "5 0 5 0",
 			hideHeaders: true,
@@ -116,14 +174,37 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
             	  header: 'Valore', 
             	  dataIndex: 'value', 
             	  flex: 50/100,
+            	  renderer: function(value, metaData, record, rowIndex, store, view){
+            		  var type = record.get("type"); 
+	  	              switch (type) {
+	                    case "java.util.Date":
+	                    case "java.util.Calendar":
+	                		var proxy = store.getProxy();
+	                		var reader = proxy.getReader();
+	                		var metadata = reader.metaData;
+	                    	
+	                		var format =  metadata.format || me.dateFormat;
+	                    	var date = Ext.util.Format.date(value, format);
+	                    	return date;
+	                        break;
+	                    default:
+	                    	var v;
+	                    	if(value.value || value.value == ""){
+	                    		v = value.value;
+	                    	}else{
+	                    		v = value;
+	                    	}
+	                		return v;
+	  	              }
+            	  },
             	  getEditor: function(record) {
             		  	var editable = record.get("editable");
             		  	if(editable){
                 		    var type = record.get("type");
                 		    
                 		    // ///////////////////////////////////////////////////////
-                		    // Set the field's validation rules using the retrieved 
-                		    // Regular Expression if any.
+                		    // Imposta la regola di validazione usando la Regular 
+                		    // Expression se esiste.
                 		    // ///////////////////////////////////////////////////////
                 		    var validation = record.get("validation");
                 		    var baseConfig = {};
@@ -139,9 +220,20 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
     	  	                switch (type) {
     		                    case "java.util.Date":
     		                    case "java.util.Calendar":
+    		                    	var format = record.get("format"); 
     		                		var config = Ext.apply({
 		            		            allowBlank: false,
+		            		            format: format
 		            		        }, baseConfig);
+    		                		
+//    		            		    return Ext.create('Ext.grid.CellEditor', { 
+//    		            		        field: Ext.create('Ext.form.FieldContainer', {
+//        		        	                items: [
+//        		        	                        Ext.create('Ext.form.field.Date', config),
+//        		        	                        Ext.create('Ext.form.field.Time', config)
+//    										]
+//        		        	            })
+//    		            		    });
     		                		
     		            		    return Ext.create('Ext.grid.CellEditor', { 
     		            		        field: Ext.create('Ext.form.field.Date', config)
@@ -156,6 +248,49 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
     		            		        field: Ext.create('Ext.form.field.Checkbox', config)
     		            		    });
     		                        break;
+    		                    case "net.sf.json.JSONObject":
+    		                    	var value = record.get("value");
+    		                    	if(value.codTPN){
+    		                            var uniqueValuesStore = new TolomeoExt.data.ToloUniqueValuesStore({
+    		                                pageSize: me.autoCompleteCfg.pageSize || 10,
+    		                    			TOLOMEOServer: me.TOLOMEOServer,
+    		                    			TOLOMEOContext: me.TOLOMEOContext
+    		                            });
+    		                            
+    		                            me.initUniqueValuesStore(uniqueValuesStore, value.codTPN, value.property);
+    		                            
+        		                		var config = {
+    		                                queryMode: "remote",
+    		                                store: uniqueValuesStore,
+    		                                pageSize: me.autoCompleteCfg.pageSize || 10,
+    		                                typeAhead: false,
+    		                                forceSelection: false,
+    		                                remoteSort: true,
+    		                                triggerAction: "all",
+    		                                allowBlank: false,
+    		                                displayField: "value",
+    		                                valueField: "value",
+    		                                minChars: 1,
+       		                                matchFieldWidth: true,
+       		                                listConfig:{
+       		                                	minWidth: 100,
+       		                                	width: 200
+       		                                },
+		       		                        listeners: {
+	       		                              beforequery: function(evt) {
+	       		                                  evt.combo.store.baseParams.start = 0;
+	       		                                  evt.combo.store.baseParams.query = evt.combo.getValue();
+	       		                              },
+	       		                              scope: me
+		       		                        }
+    		                            };
+        		                		
+        		            		    return Ext.create('Ext.grid.CellEditor', { 
+        		            		        field: Ext.create('TolomeoExt.widgets.form.ToloUniqueValuesCombo', config)
+        		            		    });
+        		            		    
+        		            		    break;
+    		                    	}
     		                    case "java.lang.String":
     		                		var config = Ext.apply({
 		            		            allowBlank: false,
@@ -183,6 +318,12 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 				scope: this,
 				edit: function(grid, cell){
 					this.setBtnStatus(true);
+				},
+				beforeEdit: function(editor, context, eOpts){
+					var value = editor.context.value;
+					if(value.value || value.value == ""){
+						editor.context.value = value.value;
+					}
 				}
 			}
 		});
@@ -196,6 +337,10 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 			hidden: true,
 			items:[this.propertyGrid]
 		});
+		
+		// ///////////////////// //
+		// FORM DI PRESENTAZIONE //
+		// ///////////////////// //
 		
 		this.formPanel = Ext.create('Ext.form.Panel', {
 		    border: 0,	
@@ -212,15 +357,15 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 		    	xtype: "button", 
 		    	minWidth: '20',
 		    	ref: "resetButton",
-		    	tooltip: "Reimposta Campi",
+		    	tooltip: this.resetTooltip,
 		    	iconCls: "reset",
 		    	disabled: true,
 		    	hidden: true,
 		    	scope: this,
 		    	handler: function(button){
 		    		Ext.MessageBox.confirm(
-	    				'Ripristino', 
-	    				'Procedere con il ripristoni dei dati allo stato iniziale?', 
+	    				this.restoreBoxTitle,
+	    				this.restoreBoxText,
 	    				function(btn){
 		    			   if(btn === 'yes'){
 		    				   this.codelessManager.restore();
@@ -233,25 +378,25 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 		    	xtype: "button", 
 		    	minWidth: '20',
 		    	ref: "saveButton",
-		    	tooltip: "Applica Modifiche",
+		    	tooltip: this.applyModsTooltip,
 		    	iconCls: "save",
 		    	disabled: true,
 		    	hidden: true,
 		    	scope: this,
 		    	handler: function(button){
 		    		
-		    		// //////////////////////////////////
-		    		// TODO: here the validity check!
-		    		// //////////////////////////////////
+		    		// ////////////////////////////////////////////////
+		    		// La Griglia ExtJS esegue già il controllo di 
+		    		// validità di un campo ripristinando il valore 
+		    		// precedente nel caso in cui tale valore inserito 
+		    		// sia invalido.
+		    		// ////////////////////////////////////////////////
 		    		
 		    		Ext.MessageBox.confirm(
-	    				'Salvataggio', 
-	    				'Procedere con il salvataggio?', 
+	    				this.saveBoxTitle,
+	    				this.saveBoxText, 
 	    				function(btn){
 		    			   if(btn === 'yes'){
-//		    				   var store = this.propertyGrid.getStore();
-//		    				   var record = store.findRecord("nl", "NL_IDTPN");
-		    				   
 		    				   if(this.mode == "new"){
 		    					   this.codelessManager.create();
 		    				   }else{
@@ -270,6 +415,27 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 		
 		this.add([this.formPanel]);
 	},
+	
+	/**
+     * Crea il componente Ext destinato a contenere il valore delle proprietà.
+     * @param {TolomeoExt.data.ToloUniqueValuesStore} store Store della combo box di auto completamento.
+     * @param {String} url Url del servizio remoto di auto completamento.
+     * @param {String} layerName codTPN da usare com eparametro della richiesta.
+     * @param {String} fieldName Nome della proprietà di cui ritornare i suggerimenti.
+     * 
+     */
+    initUniqueValuesStore: function(store, layerName, fieldName) {
+        var params = {
+            inputs: {
+            	featureTypeName: layerName,
+                fieldName: fieldName
+            },
+            start: 0,
+            limit: this.autoCompleteCfg.pageSize || 10
+        };
+        
+        store.setParams(params);
+    },
 	
 	/**
      * Crea il Gestore delle richieste se assente e registra gli eventi necessari.
@@ -335,15 +501,17 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 			this.setBtnVisibility(true);
 		}
 		
-		this.showForm();
 		this.propertyGrid.reconfigure(store);
+		
+		this.showForm();
 	},
 	
 	/**
      * Visualizza la form dei dati.
+     * @param {boolean} withDecode Stabilisce se visualizzare anche la form di decodifica.
      */
 	showForm: function(){
-		this.fieldSet.show();
+		this.fieldSet.show();		
 		this.formPanel.show();
 	},
 	

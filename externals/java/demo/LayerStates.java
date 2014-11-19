@@ -28,19 +28,28 @@ public class LayerStates extends LayerPoligoniTerritorio {
     public static final String NL_NAME = "NL_NAME";
     public static final String NL_ABBR = "NL_ABBR";
     public static final String NL_PERS = "NL_PERS";
+    public static final String NL_UPP = "NL_UPP";
+    public static final String NL_CONTINENTFK = "NL_CONTINENTFK";
     
-    public static final String UR_NAME = "UR_NAME";
-    public static final String UR_ABBR = "UR_ABBR";
-    public static final String UR_PERS = "UR_PERS";
+    public static final String HR_NAME = "HR_NAME";
+    public static final String HR_ABBR = "HR_ABBR";
+    public static final String HR_PERS = "HR_PERS";
+    public static final String HR_UPP = "HR_UPP";
+    public static final String HR_CONTINENTFK = "HR_CONTINENTFK";
     
     public static final String RE_NAME = "RE_NAME";
     public static final String RE_ABBR = "RE_ABBR";
     public static final String RE_PERS = "RE_PERS";
+    public static final String RE_UPP = "RE_UPP";
     
     public static final String RW_IDTPN = "RW_IDTPN";
     public static final String RW_NAME = "RW_NAME";
     public static final String RW_ABBR = "RE_ABBR";
     public static final String RW_PERS = "RW_PERS";
+    public static final String RW_UPP = "RW_UPP";
+    public static final String RW_CONTINENTFK = "RW_CONTINENTFK";
+    
+    public static final String FT_FK = "FT_FK";
     
     public String getConfigPrefix() {  
     	return "STATES";  
@@ -93,19 +102,28 @@ public class LayerStates extends LayerPoligoniTerritorio {
         addnomicampi(pr,ente,nomeLayer, NL_NAME);
         addnomicampi(pr,ente,nomeLayer, NL_ABBR);
         addnomicampi(pr,ente,nomeLayer, NL_PERS);
+        addnomicampi(pr,ente,nomeLayer, NL_UPP);
+        addnomicampi(pr,ente,nomeLayer, NL_CONTINENTFK);
         
-        addnomicampiLeggibili(pr,ente,nomeLayer, NL_NAME, UR_NAME);
-        addnomicampiLeggibili(pr,ente,nomeLayer, NL_ABBR, UR_ABBR);
-        addnomicampiLeggibili(pr,ente,nomeLayer, NL_PERS, UR_PERS);
+        addnomicampiLeggibili(pr,ente,nomeLayer, NL_NAME, HR_NAME);
+        addnomicampiLeggibili(pr,ente,nomeLayer, NL_ABBR, HR_ABBR);
+        addnomicampiLeggibili(pr,ente,nomeLayer, NL_PERS, HR_PERS);
+        addnomicampiLeggibili(pr,ente,nomeLayer, NL_UPP, HR_UPP);
+        addnomicampiLeggibili(pr,ente,nomeLayer, NL_CONTINENTFK, HR_CONTINENTFK);
         
         addnomicampiRegEx(pr,ente,nomeLayer, NL_NAME, RE_NAME);
         addnomicampiRegEx(pr,ente,nomeLayer, NL_ABBR, RE_ABBR);
         addnomicampiRegEx(pr,ente,nomeLayer, NL_PERS, RE_PERS);
+        addnomicampiRegEx(pr,ente,nomeLayer, NL_UPP, RE_UPP);
         
         addnomicampiReadWrite(pr,ente,nomeLayer, Layers.NL_IDTPN, RW_IDTPN);
 //        addnomicampiReadWrite(pr,ente,nomeLayer, NL_NAME, RW_NAME);
         addnomicampiReadWrite(pr,ente,nomeLayer, NL_ABBR, RW_ABBR);
         addnomicampiReadWrite(pr,ente,nomeLayer, NL_PERS, RW_PERS);
+        addnomicampiReadWrite(pr,ente,nomeLayer, NL_UPP, RW_UPP);
+        addnomicampiReadWrite(pr,ente,nomeLayer, NL_CONTINENTFK, RW_CONTINENTFK);
+        
+        addnomicampiFk(pr,ente,nomeLayer, FT_FK, FT_FK);
     }
 
 	/* 

@@ -143,10 +143,11 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
 				
 				switch(tipoEvento){
 					case 0: // Identify
-						// ///////////////////////////////////////
-						// Load all the information in order to 
-						// prepare the grid in view mode.
-						// ///////////////////////////////////////
+						// /////////////////////////////////////////////
+						// Caricamento di tutte le informazioni al 
+						// fine di preparare la griglia per la modalità
+						// di visualizzazione
+						// /////////////////////////////////////////////
 						var fparams = {
 							codTPN: this.selection.codTPN,
 							command: "view",
@@ -162,7 +163,7 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
 		    				function(btn){
 			    			   if(btn === 'yes'){
 									// ///////////////////////////////////////
-									// Delete the selected object 
+									// Cancella l'oggetto selezionato
 									// ///////////////////////////////////////
 									var fparams = {
 										codTPN: this.selection.codTPN,
@@ -177,10 +178,11 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
 						);
 						break;
 					case 3: // Edit
-						// ///////////////////////////////////////
-						// Load all the information in order to 
-						// prepare the grid in edit mode.
-						// ///////////////////////////////////////
+						// /////////////////////////////////////////////
+						// Caricamento di tutte le informazioni al 
+						// fine di preparare la griglia per la modalità 
+						// di modifica
+						// /////////////////////////////////////////////
 						var fparams = {
 							codTPN: this.selection.codTPN,
 							command: "edit",
@@ -190,10 +192,11 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
 						this.loadEditMode(fparams);
 						break;
 					case 4: // New
-						// ///////////////////////////////////////
-						// Load all the information in order to 
-						// prepare the grid for a new element.
-						// ///////////////////////////////////////
+						// ////////////////////////////////////////////
+						// Caricamento di tutte le informazioni al 
+						// fine di preparare la griglia per l'aggiunta 
+						// di un nuovo elemento 
+						// ////////////////////////////////////////////
 						if(!this.selection){
 							this.selection = this.mapApiExt.geoCoordField.getValue();
 							this.selection = Ext.decode(this.selection);
@@ -266,15 +269,9 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
 			fparams,
 			"GET",
     		function(results, store){
-				// ////////////////////////////////////////////////////////
-				// TODO: Fix this, the event (actionsEnd) is fired two 
-				// times (see also this.setMapApiExt.on('actionsEnd'))
-				// ////////////////////////////////////////////////////////
-				this.currentGeoOp = undefined;
-				
-				// ///////////////////////////////////////////////////////
-				// Check if we are trying to create a new element or not
-				// ///////////////////////////////////////////////////////
+				// //////////////////////////////////////////////////////////////
+				// Controlla se stiamo cercando di creare un nuovo elemento o no 
+				// //////////////////////////////////////////////////////////////
 				var record = store.findRecord("nl", "NL_IDTPN");
 				var recordValue = record.get("value");
 				
@@ -330,8 +327,9 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
 				"POST",
 				function(results, store){
 					// /////////////////////////////////////////////////
-					// Redraw the layer in order to refresh involved 
-					// labels during the update procedures.
+					// Ridisegna il layer per aggiornare lo stato di 
+					// eventiali etichette che sono state modificate 
+					// durante la procedura di aggiornamento.
 					// /////////////////////////////////////////////////
 					this.mapApiExt.viewer.pluginRefreshMap();
 					
@@ -365,17 +363,18 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
     		function(results){
 				if(results){
 					// /////////////////////////////////////////////////
-					// Redraw the layer in order to refresh involved 
-					// labels during the update procedures.
+					// Ridisegna il layer per aggiornare lo stato di 
+					// eventiali etichette che sono state modificate 
+					// durante la procedura di aggiornamento.
 					// /////////////////////////////////////////////////
 					this.mapApiExt.viewer.pluginRefreshMap();
 					
 					this.fireEvent("deletedata", results);
 					
-					// ///////////////////////////////////
-					// Inform the user that the operation 
-					// has been completed successfully
-					// ///////////////////////////////////
+					// ////////////////////////////////////
+					// Informa l'utente che l'operazione è 
+					// stata completata con successo.
+					// ////////////////////////////////////
 		            Ext.Msg.show({
 		                title: this.deleteDialogTitle,
 		                msg: results[0].data.Descrizione,
@@ -428,8 +427,9 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
 				"POST",
 				function(results, store){
 					// /////////////////////////////////////////////////
-					// Redraw the layer in order to refresh involved 
-					// labels during the update procedures.
+					// Ridisegna il layer per aggiornare lo stato di 
+					// eventiali etichette che sono state modificate 
+					// durante la procedura di aggiornamento.
 					// /////////////////////////////////////////////////
 					this.mapApiExt.viewer.pluginRefreshMap();
 					
@@ -457,7 +457,6 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
     		url: this.TOLOMEOServer + this.TOLOMEOContext + '/LayerItemServlet',
     		method: method,
     		params: params,
-    		waitMsg: 'Ricerca in corso...',
     		success: success,
     		failure: failure ? failure : this.doAjaxFailure,
     		scope: scope

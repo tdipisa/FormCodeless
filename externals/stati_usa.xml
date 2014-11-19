@@ -47,6 +47,8 @@
 		<property name="elencoCampiReadWrite">
 			<util:map map-class="java.util.HashMap">
 				<entry key="NL_IDTPN" value="state_fips" />
+				<entry key="NL_STATE_ABBR" value="state_abbr" />
+				<entry key="NL_STATE_PERS" value="persons" />
 			</util:map>
 		</property>
 

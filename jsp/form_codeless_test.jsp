@@ -32,6 +32,9 @@
  		<!-- TolomeoExt uncompressed classes (ONLY for test purpose) -->
  		<script type="text/javascript" src="/tolomeobinj/js/tolomeoExt/ToloMapAPIExt.js" charset="utf-8" ></script>
  		<script type="text/javascript" src="/tolomeobinj/js/tolomeoExt/ToloCrossAjax.js" charset="utf-8" ></script>
+ 		
+ 		<script type="text/javascript" src="/tolomeobinj/js/tolomeoExt/query_builder/src/data/ToloUniqueValuesStore.js" charset="utf-8" ></script>
+ 		<script type="text/javascript" src="/tolomeobinj/js/tolomeoExt/query_builder/src/widgets/form/ToloUniqueValuesCombo.js" charset="utf-8" ></script>
 		
 		<!-- Caricamento scripts per Form Codeless -->
 		<script type="text/javascript" src="/tolomeobinj/js/tolomeoExt/form_codeless/src/ToloCodeLessPanel.js" charset="utf-8" ></script>

@@ -83,6 +83,10 @@ import it.prato.comune.utilita.logging.interfaces.LogInterface;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -97,13 +101,31 @@ import net.sf.json.JSONObject;
 
 
 /**
- *      
+ * Questa classe implementa la servlet di default che viene utilizzata da Tolomeo per 
+ * il servizio di gestione della form Codeless (visualizzazione e modifica generica sui dati).
+ * E' pensata per essere richiamata via ajax.
+ * <br/>Il formato del risultato è espresso in formato JSON extjs compatibile
+ * 
+ * Accetta i seguenti parametri passati in get o post:
+ * <ul>
+ *  <li>codTPN - codice identificativo (nel package it.prato.comune.sit) del layer sul quale viene fatta l'interrogazione</li>
+ *  <li>SRID - sistema di rifermimento dei dati in output</li>
+ *  <li>command - Tipo di comando da eseguire (view, edit, update, new, delete)</li>
+ *  <li>geometry - WKT della geometria creata lato client per la nuova feature</li>
+ *  <li>data - JSON dei dati inviati dal client e da usare per la creazione o la modifica di una feature</li>
+ * </ul>
+ * 
+ * In caso di errore, oltre a scrive sul log, setta lo status della response a HttpServletResponse.SC_INTERNAL_SERVER_ERROR 
+ * e ritorna un messaggio di errore nella response stessa.    
+ * 
  * @author Tobia Di Pisa at <tobia.dipisa@geo-solutions.it>
  * 
  */
 public class LayerItemServlet extends TolomeoServlet {
 
 	private static final long serialVersionUID = -7380651195335942052L;
+	
+	private static LogInterface logger;
 
 	@Override
     public void init(ServletConfig config) throws ServletException {
@@ -119,7 +141,7 @@ public class LayerItemServlet extends TolomeoServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         
     	// Get the logger
-        LogInterface logger = getLogger(request);
+        logger = getLogger(request);
         
         // Get parameters
         Integer codTPN = getCodTPN(request);
@@ -129,7 +151,8 @@ public class LayerItemServlet extends TolomeoServlet {
         
         // Used only to create a new feature
         String wkt = request.getParameter("geometry");
-        String srid = request.getParameter("SRID");
+        @SuppressWarnings("unused")
+		String srid = request.getParameter("SRID");
         
         logger.debug("LayerItemServlet codTPN: " + codTPN);
         
@@ -169,7 +192,23 @@ public class LayerItemServlet extends TolomeoServlet {
 	        		for(int i=0; i<size; i++){
 	        			JSONObject attribute = (JSONObject)values.get(i);
 	        			
-	        			feature.setAttributeByNL((String)attribute.get("nl"), attribute.get("value"));
+	        			//
+	        			// Check if the attribute is a FK
+	        			//
+	        			HashMap<String, String> layerAttributeFk = layer.getAttributiFk();
+	        			Object nl = attribute.get("nl");
+	        			
+	        			Object value = null;
+	        			if(layerAttributeFk.containsKey(nl)){
+	        				value = this.getFkAttributeValue(layerAttributeFk.get(nl), attribute.get("value"));
+	        			}else{
+	        				value = attribute.get("value");
+	        			}
+	        			
+	        			//
+	        			// Set the new attribute value
+	        			//
+	        			feature.setAttributeByNL(nl.toString(), value);
 	        		}
 	        		
 	        		layer.modifyFeature(feature);
@@ -195,12 +234,27 @@ public class LayerItemServlet extends TolomeoServlet {
 	        		for(int i=0; i<size; i++){
 	        			JSONObject attribute = (JSONObject)values.get(i);
 	        			
-	        			String property = (String)attribute.get("nl");
-	        			if(property.equals("NL_IDTPN")){
+	        			Object nl = attribute.get("nl");
+	        			if(nl.equals("NL_IDTPN")){
 	        				idTPN = (String)attribute.get("value");
 	        			}
 	        			
-	        			feature.setAttributeByNL((String)attribute.get("nl"), attribute.get("value"));
+	        			//
+	        			// Check if the attribute is a FK
+	        			//
+	        			HashMap<String, String> layerAttributeFk = layer.getAttributiFk();
+	        			
+	        			Object value = null;
+	        			if(layerAttributeFk.containsKey(nl)){
+	        				value = this.getFkAttributeValue(layerAttributeFk.get(nl), attribute.get("value"));
+	        			}else{
+	        				value = attribute.get("value");
+	        			}
+	        			
+	        			//
+	        			// Set the new attribute value
+	        			//
+	        			feature.setAttributeByNL(nl.toString(), value);
 	        		}
 	        		
 	        		feature.setGeometryAttributeWKT(wkt);
@@ -210,7 +264,14 @@ public class LayerItemServlet extends TolomeoServlet {
 	        		responseObj = this.buildEditResponse(layer, idTPN);
 	        	}
 	        	
-        		responseObj.put("security", "all");
+	        	JSONObject metaData = (JSONObject)responseObj.get("metaData");
+	        	
+	    		// ////////////////////
+	    		// Privileges settings 
+	    		// ////////////////////
+	        	metaData.put("dateFormat", "YYYY-MM-DD");
+	    		metaData.put("security", "all");
+        		
 	        	resp = responseObj.toString();
 	        	
 	        } else {
@@ -218,6 +279,7 @@ public class LayerItemServlet extends TolomeoServlet {
 	        	resp = new ExtStoreError(errMsg,null).toJSONString();
 	            logger.error(errMsg);
 	        }
+	        
         } catch (SITException e) {
         	String errMsg = e.getMessage();
         	resp = new ExtStoreError(errMsg, null).toJSONString();
@@ -241,6 +303,39 @@ public class LayerItemServlet extends TolomeoServlet {
     }
 	
 	/**
+	 * Restituisce il valore della chiave primaria passata come argomento.
+	 * 
+	 * @param fk
+	 * @param layerAttributeFk
+	 * @param value
+	 * @return Object
+	 * @throws IOException
+	 * @throws SITException
+	 */
+	private Object getFkAttributeValue(String fk, Object value) throws IOException, SITException {
+    	SITLayersManager comunePO = null;
+    	
+    	// Get the Oggetto Territorio
+    	comunePO = getTerritorio(logger);
+        
+    	String[] arrayMetadata = fk.split(":");
+    	int codTPN = Integer.valueOf(arrayMetadata[0]);
+    	
+    	// Get the layer identified by codTPN
+        LayerTerritorio layer = comunePO.getLayerByCodTPN(codTPN);
+        
+        Object val = null;
+        if(layer != null){
+        	ArrayList<OggettoTerritorio> features = layer.cerca(1, value);
+        	OggettoTerritorio feature = features.get(0);
+        	
+        	val = feature.getIDTPN();
+        }
+        
+        return val;
+	}
+
+	/**
 	 * Restituisce lo store finale dei dati da fornire al client.
 	 * 
 	 * @param view
@@ -258,8 +353,9 @@ public class LayerItemServlet extends TolomeoServlet {
      * @param idTPN
      * @return JSONObject
      * @throws SITException
+     * @throws IOException 
      */
-    private JSONObject buildEditResponse(LayerTerritorio layer, String idTPN) throws SITException{
+    private JSONObject buildEditResponse(LayerTerritorio layer, String idTPN) throws SITException, IOException{
 		HashMap<String, String> layerAttributeNames = layer.getNomiCampiScrittura();
 		JSONArray view = this.buildOutputConfiguration(idTPN, layer, layerAttributeNames, true);
 		JSONObject responseObj = this.buildExtStore(view);
@@ -276,13 +372,16 @@ public class LayerItemServlet extends TolomeoServlet {
      * @param editable
      * @return JSONArray
      * @throws SITException
+     * @throws IOException 
      */
     private JSONArray buildOutputConfiguration(String idTPN, LayerTerritorio layer, 
-    		HashMap<String, String> layerAttributeNames, boolean editable) throws SITException{
+    		HashMap<String, String> layerAttributeNames, boolean editable) throws SITException, IOException{
     	
     	HashMap<String, String> layerAttributeNamesReadable = layer.getNomiCampiLegibili();
     	HashMap<String, Class<?>> layerAttributeTypes = layer.getAttributiTipo();
     	HashMap<String, String> layerAttributeRegEx = layer.getAttributiRegEx();
+    	
+    	HashMap<String, String> layerAttributeFk = layer.getAttributiFk();
     	
     	// //////////////////////////////////////////////
     	// Feature could be null if we are trying to 
@@ -306,30 +405,69 @@ public class LayerItemServlet extends TolomeoServlet {
 		levelName.put("type", layer.getNome().getClass());
 		levelName.put("editable", false);
 		levelName.put("validation", "undefined");
-		
+				
 		view.add(levelName);
 		
 		// ///////////////////////////////
 		// Fill records for attributes
 		// ///////////////////////////////
 		while(iterator.hasNext()){
-			String key = (String)iterator.next();
+			String nl = (String)iterator.next();
 			
-			String nr = layerAttributeNamesReadable.get(key);
-			String nl = layerAttributeNames.get(key);
+			String nr = layerAttributeNamesReadable.get(nl);
+			String attributeName = layerAttributeNames.get(nl);
 			
-			String validation = layerAttributeRegEx.get(key); 
+			String validation = layerAttributeRegEx.get(nl); 
 			
 			JSONObject attribute = new JSONObject();
-			attribute.put("name", nr != null ? nr : nl);
-			attribute.put("nl", key);
-			attribute.put("value", !newFeature ? feature.getAttributeByNL(key) : "");
-			attribute.put("type", layerAttributeTypes.get(key));
+			attribute.put("name", nr != null ? nr : attributeName);
+			attribute.put("nl", nl);
+			
+			//
+			// Determine the value and type of the attribute
+			// 
+			Object value = null;
+			Class<?> type = null;
+			if(!newFeature){
+				value = feature.getAttributeByNL(nl);
+				
+				if(value instanceof Date){
+					//
+					// Managing Date fields
+					//
+					long time = ((Date) value).getTime();
+					Date date = new Date(time);		
+					
+					DateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+					value = dateFormat.format(date);
+					
+					type = date.getClass();
+				}else if(layerAttributeFk.containsKey(nl)){
+					value = this.getFkMetadata(nl, feature, layerAttributeFk, editable);
+					type = value.getClass();
+				}else{
+					//
+					// Managing all the other fields
+					//
+					type = layerAttributeTypes.get(nl);
+				}
+			}else{
+				if(layerAttributeFk.containsKey(nl)){
+					value = this.getFkMetadata(nl, feature, layerAttributeFk, editable);
+					type = value.getClass();
+				}else{
+					value = "";
+					type = layerAttributeTypes.get(nl);
+				}
+			}
+			
+			attribute.put("value", value);
+			attribute.put("type", type);
 			attribute.put("validation", validation != null ? validation : "undefined");
 			
 			// In 'edit' or 'new' modes by default the field is editable 
 			boolean edit = editable;
-			if(!newFeature && key.equals("NL_IDTPN")){
+			if(!newFeature && nl.equals("NL_IDTPN")){
 				// //////////////////////////////////////////////////
 				// In edit mode the IDTPN should not be editable 
 				// //////////////////////////////////////////////////
@@ -340,7 +478,7 @@ public class LayerItemServlet extends TolomeoServlet {
 				// if specified in configuration (config.txt on Spring).
 				// ///////////////////////////////////////////////////////////
 				HashMap<String, String> nomiCampiRW = layer.getAttributiReadWrite();
-				if(nomiCampiRW != null && nomiCampiRW.get(key) != null){
+				if(nomiCampiRW != null && nomiCampiRW.get(nl) != null){
 					// We have to check if we are in 'view' mode or not before setting the flag.
 					edit = editable ? true : false;
 				}else{
@@ -356,7 +494,91 @@ public class LayerItemServlet extends TolomeoServlet {
 		return view;
     }
 
-    @Override
+    /**
+     * @param nl 
+     * @param feature
+     * @param layerAttributeFk
+     * @param editable
+     * @return Object
+     * @throws SITException 
+     * @throws IOException 
+     */
+    private Object getFkMetadata(String nl, OggettoTerritorio feature,
+			HashMap<String, String> layerAttributeFk, boolean editable) throws IOException, SITException {
+		//
+		// Current attribute is a foreign key
+	    //
+		String fk = layerAttributeFk.get(nl);
+		
+		// If we have feature==null we are trying to create a new object
+		Object fkIdValue = feature != null ? feature.getAttributeByNL(nl) : null;
+		JSONObject fkMetadata = this.fkOutputObject(fk, fkIdValue, editable);
+		
+		Object value = null;
+		if(editable){
+			value = fkMetadata;
+		}else{
+			value = fkMetadata.get("value");
+		}
+		
+		return value;
+	}
+
+	/**
+     * Restituisce la configurazione JSON sui metadati relativi alla FK questi saranno usati 
+     * lato client per gestire le funzionalità de decodifica.
+     * 
+     * @param fk
+     * @param idTPN
+     * @param layerAttributeNames
+     * @param editable
+     * @return JSONObject
+     * @throws IOException
+     * @throws SITException
+     */
+    private JSONObject fkOutputObject(String fk, Object idTPN, boolean editable) throws IOException, SITException {
+    	
+    	SITLayersManager comunePO = null;
+    	
+    	// Get the Oggetto Territorio
+    	comunePO = getTerritorio(logger);
+        
+    	String[] arrayMetadata = fk.split(":");
+    	int codTPN = Integer.valueOf(arrayMetadata[0]);
+    	String nl_fk = arrayMetadata[1];
+    	
+    	// Get the layer identified by codTPN
+        LayerTerritorio layer = comunePO.getLayerByCodTPN(codTPN);
+        
+        JSONObject fkMetadata = null;
+        if(layer != null){
+        	HashMap<String, String> nomiCampi = layer.getNomiCampi();
+        	
+        	fkMetadata = new JSONObject();
+        	
+        	if(editable){
+            	fkMetadata.put("codTPN", codTPN);
+            	
+            	if(nomiCampi.containsKey(nl_fk)){
+            		fkMetadata.put("property", nomiCampi.get(nl_fk));
+            	}else{
+            		throw new SITException("Tabella di decodifica non configurata correttamente, nome logico: " + nl_fk + " non definita.");
+            	}
+        	}
+        	
+        	// If we have idTPN==null we are trying to create a new object
+        	if(idTPN != null){
+            	OggettoTerritorio feature = layer.cercaIDTPN(idTPN.toString());
+            	fkMetadata.put("value", feature.getAttributeByNL(nl_fk));
+        	}else{
+            	fkMetadata.put("value", "");
+        	}
+        }
+		
+		return fkMetadata;
+	}
+
+	@Override
     protected String getDefaultForward() {
         return "/jsp/tolomeoAjaxQuery.jsp";
     }

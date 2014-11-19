@@ -230,6 +230,9 @@ public abstract class LayerTerritorio implements Layers, IGetFeatureInfoLayer{
     private HashMap<String, String> attributiRegEx = new HashMap<String, String>();
     private HashMap<String, String> attributiReadWrite = new HashMap<String, String>();
     
+//    private String[] fkArray = null;
+    private HashMap<String, String> attributiFk = new HashMap<String, String>();
+    
     private HashMap<Integer, MetadatoRicerche> ricerche = new HashMap<Integer, MetadatoRicerche>();
 
     private String espressioneDescrizione = null;
@@ -764,6 +767,40 @@ public abstract class LayerTerritorio implements Layers, IGetFeatureInfoLayer{
         }      
 
     }
+
+    /**
+     * @param pr
+     * @param ente
+     * @param nomeLayer
+     * @param szNL
+     * @param prefix
+     * @return String[]
+     */
+    protected String[] addnomicampiExt(Properties pr, String ente, String nomeLayer, String szNL, String prefix) { 
+    	String prefixProp = null;
+    	if(pr != null && ente != null && nomeLayer != null){
+            String nomeCampoProp = ente + nomeLayer + prefix;         
+            prefixProp = pr.getProperty(nomeCampoProp);   
+    	}else{
+    		prefixProp = prefix;
+    	}
+
+        if (prefixProp!=null){
+        	String prop = null;
+        	if(prefixProp.contains("!!")){
+        		prop = prefixProp.split("!!")[0];
+        	}else{
+        		prop = prefixProp;
+        	}
+        	
+        	String[] array = new String[]{szNL, prop};
+        	return array;
+        } else {
+            logger.info(this.getClass().getName() + " nome campo nullo: " + prefixProp);
+        }    
+        
+        return null;
+    }
     
     /**
      * @param pr
@@ -773,27 +810,24 @@ public abstract class LayerTerritorio implements Layers, IGetFeatureInfoLayer{
      * @param prefix
      */
     protected void addnomicampiLeggibili(Properties pr, String ente, String nomeLayer, String szNL, String prefix) { 
-    	String prefixProp = null;
-    	if(pr != null && ente != null && nomeLayer != null){
-            String nomeCampoProp = ente + nomeLayer + prefix;         
-            prefixProp = pr.getProperty(nomeCampoProp);   
-    	}else{
-    		prefixProp = prefix;
+    	String[] nomiCamiLeggibili = this.addnomicampiExt(pr, ente, nomeLayer, szNL, prefix);
+    	if(nomiCamiLeggibili != null){
+    		this.getNomiCampiLegibili().put(nomiCamiLeggibili[0], nomiCamiLeggibili[1]); 
     	}
+    }
 
-        if (prefixProp!=null){
-        	String prop = null;
-        	if(prefixProp.contains("!!")){
-        		prop = prefixProp.split("!!")[0];
-        	}else{
-        		prop = prefixProp;
-        	}
-        	
-            this.getNomiCampiLegibili().put(szNL, prop);
-
-        } else {
-            logger.info(this.getClass().getName() + " nome campo nullo: " + prefixProp);
-        }    
+    /**
+     * @param pr
+     * @param ente
+     * @param nomeLayer
+     * @param szNL
+     * @param prefix
+     */
+    protected void addnomicampiRegEx(Properties pr, String ente, String nomeLayer, String szNL, String prefix) { 
+    	String[] nomicampiRegEx = this.addnomicampiExt(pr, ente, nomeLayer, szNL, prefix);
+    	if(nomicampiRegEx != null){
+    		this.getAttributiRegEx().put(nomicampiRegEx[0], nomicampiRegEx[1]); 
+    	}
     }
     
     /**
@@ -803,52 +837,37 @@ public abstract class LayerTerritorio implements Layers, IGetFeatureInfoLayer{
      * @param szNL
      * @param prefix
      */
-    protected void addnomicampiRegEx(Properties pr, String ente, String nomeLayer, String szNL, String prefix) { 
-    	String prefixProp = null;
-    	if(pr != null && ente != null && nomeLayer != null){
-            String nomeCampoProp = ente + nomeLayer + prefix;         
-            prefixProp = pr.getProperty(nomeCampoProp);   
-    	}else{
-    		prefixProp = prefix;
+    protected void addnomicampiReadWrite(Properties pr, String ente, String nomeLayer, String szNL, String prefix) { 
+    	String[] nomicampiReadWrite = this.addnomicampiExt(pr, ente, nomeLayer, szNL, prefix);
+    	if(nomicampiReadWrite != null){
+    		this.getAttributiReadWrite().put(nomicampiReadWrite[0], nomicampiReadWrite[1]); 
     	}
-        
-        if (prefixProp!=null){
-        	String prop = null;
-        	if(prefixProp.contains("!!")){
-        		prop = prefixProp.split("!!")[0];
-        	}else{
-        		prop = prefixProp;
-        	}
-        	
-            this.getAttributiRegEx().put(szNL, prop);
-
-        } else {
-            logger.info(this.getClass().getName() + " nome campo nullo: " + prefixProp);
-        }  
     }
     
-    protected void addnomicampiReadWrite(Properties pr, String ente, String nomeLayer, String szNL, String prefix) { 
-    	String prefixProp = null;
-    	if(pr != null && ente != null && nomeLayer != null){
-            String nomeCampoProp = ente + nomeLayer + prefix;         
-            prefixProp = pr.getProperty(nomeCampoProp);   
-    	}else{
-    		prefixProp = prefix;
+    /**
+     * @param pr
+     * @param ente
+     * @param nomeLayer
+     * @param szNL
+     * @param prefix
+     */
+    protected void addnomicampiFk(Properties pr, String ente, String nomeLayer, String szNL, String prefix) { 
+    	String[] nomicampiFk = this.addnomicampiExt(pr, ente, nomeLayer, szNL, prefix);
+    	if(nomicampiFk != null){
+    		String[] fkArray = null;
+    		if(nomicampiFk[1].contains(";")){
+    			fkArray = nomicampiFk[1].split(";");
+    			for(int i=0; i<fkArray.length; i++){
+    				String key = fkArray[i];
+    				String[] kv = key.split(":");
+    				attributiFk.put(kv[0], kv[1].concat(":" + kv[2]));
+    			}
+    		}else{
+				String key = nomicampiFk[1];
+				String[] kv = key.split(":");
+				attributiFk.put(kv[0], kv[1].concat(":" + kv[2]));
+    		}
     	}
-        
-        if (prefixProp!=null){
-        	String prop = null;
-        	if(prefixProp.contains("!!")){
-        		prop = prefixProp.split("!!")[0];
-        	}else{
-        		prop = prefixProp;
-        	}
-        	
-            this.getAttributiReadWrite().put(szNL, prop);
-
-        } else {
-            logger.info(this.getClass().getName() + " nome campo nullo: " + prefixProp);
-        }  
     }
     
 	/**
@@ -5144,7 +5163,21 @@ public abstract class LayerTerritorio implements Layers, IGetFeatureInfoLayer{
 	public void setAttributiReadWrite(HashMap<String, String> attributiReadWrite) {
 		this.attributiReadWrite = attributiReadWrite;
 	}
-	
+
+	/**
+	 * @return the attributiFk
+	 */
+	public HashMap<String, String> getAttributiFk() {
+		return attributiFk;
+	}
+
+	/**
+	 * @param attributiFk the attributiFk to set
+	 */
+	public void setAttributiFk(HashMap<String, String> attributiFk) {
+		this.attributiFk = attributiFk;
+	}
+
 //  [regionend]
 
 }
