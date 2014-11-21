@@ -264,12 +264,19 @@ public class LayerItemServlet extends TolomeoServlet {
 	        		responseObj = this.buildEditResponse(layer, idTPN);
 	        	}
 	        	
+	        	// //////////////////////////////////////////////
+	        	// Set all metadata for the required operation 
+	        	// //////////////////////////////////////////////
 	        	JSONObject metaData = (JSONObject)responseObj.get("metaData");
+
+	    		// 
+	    		// Date format setting
+	    		//
+	        	metaData.put("dateFormat", layer.getDateFormat());
 	        	
-	    		// ////////////////////
-	    		// Privileges settings 
-	    		// ////////////////////
-	        	metaData.put("dateFormat", "YYYY-MM-DD");
+	    		// 
+	    		// Privileges setting
+	    		//
 	    		metaData.put("security", "all");
         		
 	        	resp = responseObj.toString();
@@ -380,6 +387,7 @@ public class LayerItemServlet extends TolomeoServlet {
     	HashMap<String, String> layerAttributeNamesReadable = layer.getNomiCampiLegibili();
     	HashMap<String, Class<?>> layerAttributeTypes = layer.getAttributiTipo();
     	HashMap<String, String> layerAttributeRegEx = layer.getAttributiRegEx();
+    	HashMap<String, String> defaultValues = layer.getDefaultAttributeValues();
     	
     	HashMap<String, String> layerAttributeFk = layer.getAttributiFk();
     	
@@ -438,7 +446,7 @@ public class LayerItemServlet extends TolomeoServlet {
 					long time = ((Date) value).getTime();
 					Date date = new Date(time);		
 					
-					DateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+					DateFormat dateFormat = new SimpleDateFormat(layer.getDateFormat());
 					value = dateFormat.format(date);
 					
 					type = date.getClass();
@@ -452,13 +460,27 @@ public class LayerItemServlet extends TolomeoServlet {
 					type = layerAttributeTypes.get(nl);
 				}
 			}else{
-				if(layerAttributeFk.containsKey(nl)){
+				type = layerAttributeTypes.get(nl);
+				value = "";
+				
+				//
+				// Determine before if the attribute type is a Date.
+				//
+				boolean isDateType = new Date().getClass().isAssignableFrom(type);
+				
+				if(isDateType){
+					type = new Date().getClass();
+				}else if(layerAttributeFk.containsKey(nl)){
 					value = this.getFkMetadata(nl, feature, layerAttributeFk, editable);
 					type = value.getClass();
-				}else{
-					value = "";
-					type = layerAttributeTypes.get(nl);
 				}
+			}
+			
+			//
+			// Check if a default exists for this attribute 
+			//
+			if(defaultValues.containsKey(nl) && newFeature){
+				value = defaultValues.get(nl);
 			}
 			
 			attribute.put("value", value);
@@ -495,6 +517,8 @@ public class LayerItemServlet extends TolomeoServlet {
     }
 
     /**
+     * Restituisce l'oggetto dei metadati che caratterizza la FK.
+     * 
      * @param nl 
      * @param feature
      * @param layerAttributeFk
@@ -562,7 +586,7 @@ public class LayerItemServlet extends TolomeoServlet {
             	if(nomiCampi.containsKey(nl_fk)){
             		fkMetadata.put("property", nomiCampi.get(nl_fk));
             	}else{
-            		throw new SITException("Tabella di decodifica non configurata correttamente, nome logico: " + nl_fk + " non definita.");
+            		throw new SITException("Tabella di decodifica non configurata correttamente, nome logico: " + nl_fk + " non definito.");
             	}
         	}
         	

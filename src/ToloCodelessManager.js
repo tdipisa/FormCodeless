@@ -207,7 +207,7 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
 							command: "edit"
 						}; 
 						
-						this.loadEditMode(fparams);
+						this.loadEditMode(fparams, true);
 						break;
 				}
 			},	
@@ -262,21 +262,18 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
      * @param {Object} fparams Oggetto contenente i parametri che saranno usati nella richista. 
      *
      */
-    loadEditMode: function(fparams){       	
+    loadEditMode: function(fparams, isNew){       	
     	this.fireEvent("beforeloaddata");
     	
 		this.request(
 			fparams,
 			"GET",
     		function(results, store){
+				var mode = "edit";
 				// //////////////////////////////////////////////////////////////
 				// Controlla se stiamo cercando di creare un nuovo elemento o no 
 				// //////////////////////////////////////////////////////////////
-				var record = store.findRecord("nl", "NL_IDTPN");
-				var recordValue = record.get("value");
-				
-				var mode = "edit";
-				if(recordValue == ""){
+				if(isNew){
 					mode = "new";
 				}
 				
@@ -463,6 +460,18 @@ Ext.define('TolomeoExt.ToloCodelessManager', {
     	};
     	
 		new TolomeoExt.ToloCrossAjax().request(submitOpt);
+    },
+    
+    /**
+     * Restituisce i metadati della richiesta.
+     */  
+    getRequestMetadata: function(store){
+    	var gridStore = store || this.store;
+		var proxy = gridStore.getProxy();
+		var reader = proxy.getReader();
+		var metadata = reader.metaData;
+		
+		return metadata;
     },
     
     /**

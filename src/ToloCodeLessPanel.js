@@ -82,6 +82,18 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 	saveBoxText: "Procedere con il salvataggio?", 
 	
 	/**
+	 * @cfg {String} missingIDTPNTitle
+	 * Titolo da mostrare in fase di salvataggio se il campo relativo all'IDTPN non risulta valorizzato.
+	 */
+	missingIDTPNTitle: "IDTPN Mancante",
+	
+	/**
+	 * @cfg {String} missingIDTPNText
+	 * Testo da mostrare per la dialog di avviso in fase di salvataggio se il campo relativo all'IDTPN non risulta valorizzato.
+	 */
+	missingIDTPNText: "Il campo relativo all'IDTPN deve essere inserito prima di procedere",
+	
+	/**
      * @cfg {Object} autoCompleteCfg [autoCompleteCfg="{}"]
 	 * Stabilisce la configurazione da usare per la funzionalità di autocompletamento.
 	 *
@@ -92,7 +104,32 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 	 * }
      */
     autoCompleteCfg: {},
-	
+    
+	/**
+	 * @cfg {Number} pageSize
+	 * Indica il massimo numero di elementi per pagina per la combo di autocompletamento usato per 
+	 * gli editor di FKs.
+	 */
+    pageSize: 10,
+    
+	/**
+	 * @cfg {String} dateFormat [dateFormat="c"]
+	 * Indica il formato per i campi editor di tipo "data" (il valore predefinito e 'c' che corrispondea 'ISO 8601 date').
+	 */
+    dateFormat: "c",
+    
+	/**
+	 * @cfg {Array} dateFormats
+	 * Formati di data ExtJS disponibili per gli editor di campi data di questo componente.
+	 */
+    dateFormats: [
+        {java: "yyyy-MM-dd'T'HH:mm:ss", ext: "Y-m-d H:i:s"},
+        {java: "yyyy-MM-dd", ext: "Y-m-d"},
+        {java: "dd-MM-yyyy", ext: "d-m-Y"},
+        {java: "dd-MM-yyyy", ext: "d-m-Y"},
+        {java: "MM-dd-yyyy", ext: "m-d-Y"}		
+    ],
+    
 	/**
 	 * @property {TolomeoExt.ToloCodelessManager} codelessManager
 	 * Gestore delle operazioni del componente.
@@ -179,17 +216,17 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 	  	              switch (type) {
 	                    case "java.util.Date":
 	                    case "java.util.Calendar":
-	                		var proxy = store.getProxy();
-	                		var reader = proxy.getReader();
-	                		var metadata = reader.metaData;
-	                    	
-	                		var format =  metadata.format || me.dateFormat;
+	                    	var format =  me.getDateFormat();
 	                    	var date = Ext.util.Format.date(value, format);
 	                    	return date;
 	                        break;
 	                    default:
 	                    	var v;
 	                    	if(value.value || value.value == ""){
+	                    		// /////////////////////////////////////////
+	                    		// Questo imposta il valore della combo di 
+	                    		// autocompletamento (usato per le FK)
+	                    		// /////////////////////////////////////////
 	                    		v = value.value;
 	                    	}else{
 	                    		v = value;
@@ -219,21 +256,11 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
                 		    
     	  	                switch (type) {
     		                    case "java.util.Date":
-    		                    case "java.util.Calendar":
-    		                    	var format = record.get("format"); 
+    		                		var format =  me.getDateFormat();
     		                		var config = Ext.apply({
 		            		            allowBlank: false,
 		            		            format: format
 		            		        }, baseConfig);
-    		                		
-//    		            		    return Ext.create('Ext.grid.CellEditor', { 
-//    		            		        field: Ext.create('Ext.form.FieldContainer', {
-//        		        	                items: [
-//        		        	                        Ext.create('Ext.form.field.Date', config),
-//        		        	                        Ext.create('Ext.form.field.Time', config)
-//    										]
-//        		        	            })
-//    		            		    });
     		                		
     		            		    return Ext.create('Ext.grid.CellEditor', { 
     		            		        field: Ext.create('Ext.form.field.Date', config)
@@ -252,7 +279,7 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
     		                    	var value = record.get("value");
     		                    	if(value.codTPN){
     		                            var uniqueValuesStore = new TolomeoExt.data.ToloUniqueValuesStore({
-    		                                pageSize: me.autoCompleteCfg.pageSize || 10,
+    		                                pageSize: me.autoCompleteCfg.pageSize || me.pageSize,
     		                    			TOLOMEOServer: me.TOLOMEOServer,
     		                    			TOLOMEOContext: me.TOLOMEOContext
     		                            });
@@ -262,7 +289,7 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
         		                		var config = {
     		                                queryMode: "remote",
     		                                store: uniqueValuesStore,
-    		                                pageSize: me.autoCompleteCfg.pageSize || 10,
+    		                                pageSize: me.autoCompleteCfg.pageSize || me.pageSize,
     		                                typeAhead: false,
     		                                forceSelection: false,
     		                                remoteSort: true,
@@ -320,6 +347,10 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 					this.setBtnStatus(true);
 				},
 				beforeEdit: function(editor, context, eOpts){
+            		// /////////////////////////////////////////
+            		// Questo imposta il valore della combo di 
+            		// autocompletamento (usato per le FK)
+            		// /////////////////////////////////////////
 					var value = editor.context.value;
 					if(value.value || value.value == ""){
 						editor.context.value = value.value;
@@ -398,7 +429,25 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 	    				function(btn){
 		    			   if(btn === 'yes'){
 		    				   if(this.mode == "new"){
-		    					   this.codelessManager.create();
+		    					   var record = this.propertyGrid.getStore().findRecord("nl", "NL_IDTPN");
+		    					   var recordValue = record.get("value");
+		    					   var editable = record.get("editable");
+		    					   
+		    					   // //////////////////////////////////////////////////////////
+		    					   // Si controlla se il campo relativo all'IDTPN è valorizzato 
+		    					   // nel caso in cui debba esserlo secondo le impostazioni del 
+		    					   // server.
+		    					   // //////////////////////////////////////////////////////////
+		    					   if((!recordValue || recordValue == "") && editable){
+		    				            Ext.Msg.show({
+		    				                title: this.missingIDTPNTitle,
+		    				                msg: this.missingIDTPNText,
+		    				                buttons: Ext.Msg.OK,
+		    				                icon: Ext.MessageBox.WARNING
+		    				            }); 
+		    					   }else{
+		    						   this.codelessManager.create();
+		    					   }
 		    				   }else{
 		    					   this.codelessManager.update();
 		    				   }
@@ -417,6 +466,43 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 	},
 	
 	/**
+     * Restituisce il formato data da usare per l'editor. 
+     * 
+     */
+	getDateFormat: function(){
+		var metadata = this.codelessManager.getRequestMetadata();
+    	
+		// ////////////////////////////////////////////////////////////
+		// Usa ISO-8601 come formato data se non viene trovata nessuna 
+		// corrispondenza attraverso l'invocazione di getExtDateFormat.
+		// ////////////////////////////////////////////////////////////
+		var format =  metadata ? (this.getExtDateFormat(metadata.dateFormat) || this.dateFormat) : this.dateFormat;
+		return format;
+	},
+	
+	/**
+     * Converte il formato Data fornito dal server sulla base di quelli disponibili 
+     * in configurazione. 
+     * @param {String} format formato da usare per il campo editor della data.
+     * 
+     */
+	getExtDateFormat: function(format){
+		var date_format;
+		
+		if(format){
+			for(var i=0; i<this.dateFormats.length; i++){
+				var df = this.dateFormats[i];
+				if(format == df.java){
+					date_format = df.ext;
+					break;
+				}
+			}
+		}
+		
+		return date_format;
+	},
+	
+	/**
      * Crea il componente Ext destinato a contenere il valore delle proprietà.
      * @param {TolomeoExt.data.ToloUniqueValuesStore} store Store della combo box di auto completamento.
      * @param {String} url Url del servizio remoto di auto completamento.
@@ -431,7 +517,7 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
                 fieldName: fieldName
             },
             start: 0,
-            limit: this.autoCompleteCfg.pageSize || 10
+            limit: this.autoCompleteCfg.pageSize || this.pageSize
         };
         
         store.setParams(params);
@@ -502,6 +588,27 @@ Ext.define('TolomeoExt.ToloCodeLessPanel', {
 		}
 		
 		this.propertyGrid.reconfigure(store);
+		
+		// ///////////////////////////////////////////////////////////
+		// Se sono stati forniti dal server valori di default per i 
+		// campi della form allora le rispettive celle delle griglia 
+		// devono essere marcate come valorizzate (DIRTY).
+		// ///////////////////////////////////////////////////////////
+		if(mode == "new"){
+			var gridStore = this.propertyGrid.getStore();
+			var isDirty = false;
+			gridStore.each(function(r) {
+				var value = r.get("value");
+				var nl = r.get("nl");
+                if (value != "" && nl != "") {
+                   r.setDirty();
+                   isDirty = true;
+                }
+            });
+            
+			// Se alcuni campi sono valorizzati abilitare i pulsanti della toolbar.
+			this.setBtnStatus(isDirty);
+		}
 		
 		this.showForm();
 	},

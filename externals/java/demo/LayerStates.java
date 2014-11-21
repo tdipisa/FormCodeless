@@ -49,7 +49,15 @@ public class LayerStates extends LayerPoligoniTerritorio {
     public static final String RW_UPP = "RW_UPP";
     public static final String RW_CONTINENTFK = "RW_CONTINENTFK";
     
+    public static final String DV_NAME = "DV_NAME";
+    public static final String DV_ABBR = "DV_ABBR";
+    public static final String DV_PERS = "DV_PERS";
+    public static final String DV_UPP = "DV_UPP";
+    public static final String DV_CONTINENTFK = "DV_CONTINENTFK";
+    
     public static final String FT_FK = "FT_FK";
+    
+    public static final String DATE_FORMAT = "DATE_FORMAT";
     
     public String getConfigPrefix() {  
     	return "STATES";  
@@ -117,13 +125,21 @@ public class LayerStates extends LayerPoligoniTerritorio {
         addnomicampiRegEx(pr,ente,nomeLayer, NL_UPP, RE_UPP);
         
         addnomicampiReadWrite(pr,ente,nomeLayer, Layers.NL_IDTPN, RW_IDTPN);
-//        addnomicampiReadWrite(pr,ente,nomeLayer, NL_NAME, RW_NAME);
+        addnomicampiReadWrite(pr,ente,nomeLayer, NL_NAME, RW_NAME);
         addnomicampiReadWrite(pr,ente,nomeLayer, NL_ABBR, RW_ABBR);
         addnomicampiReadWrite(pr,ente,nomeLayer, NL_PERS, RW_PERS);
         addnomicampiReadWrite(pr,ente,nomeLayer, NL_UPP, RW_UPP);
         addnomicampiReadWrite(pr,ente,nomeLayer, NL_CONTINENTFK, RW_CONTINENTFK);
         
+        addDefaultValueForField(pr,ente,nomeLayer, NL_NAME, DV_NAME);
+        addDefaultValueForField(pr,ente,nomeLayer, NL_ABBR, DV_ABBR);
+        addDefaultValueForField(pr,ente,nomeLayer, NL_PERS, DV_PERS);
+        addDefaultValueForField(pr,ente,nomeLayer, NL_UPP, DV_UPP);
+        addDefaultValueForField(pr,ente,nomeLayer, NL_CONTINENTFK, DV_CONTINENTFK);
+        
         addnomicampiFk(pr,ente,nomeLayer, FT_FK, FT_FK);
+        
+        addnomicampiDateFormat(pr,ente,nomeLayer, DATE_FORMAT, DATE_FORMAT);
     }
 
 	/* 

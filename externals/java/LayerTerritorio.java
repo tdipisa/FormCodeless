@@ -229,9 +229,11 @@ public abstract class LayerTerritorio implements Layers, IGetFeatureInfoLayer{
     private HashMap<String, String> nomiCampiLegibili = new HashMap<String, String>();
     private HashMap<String, String> attributiRegEx = new HashMap<String, String>();
     private HashMap<String, String> attributiReadWrite = new HashMap<String, String>();
+    private HashMap<String, String> defaultAttributeValues= new HashMap<String, String>();
     
-//    private String[] fkArray = null;
     private HashMap<String, String> attributiFk = new HashMap<String, String>();
+    
+    private String dateFormat = null;
     
     private HashMap<Integer, MetadatoRicerche> ricerche = new HashMap<Integer, MetadatoRicerche>();
 
@@ -851,6 +853,20 @@ public abstract class LayerTerritorio implements Layers, IGetFeatureInfoLayer{
      * @param szNL
      * @param prefix
      */
+    protected void addDefaultValueForField(Properties pr, String ente, String nomeLayer, String szNL, String prefix) { 
+    	String[] defaultValues = this.addnomicampiExt(pr, ente, nomeLayer, szNL, prefix);
+    	if(defaultValues != null){
+    		this.getDefaultAttributeValues().put(defaultValues[0], defaultValues[1]); 
+    	}
+    }
+    
+    /**
+     * @param pr
+     * @param ente
+     * @param nomeLayer
+     * @param szNL
+     * @param prefix
+     */
     protected void addnomicampiFk(Properties pr, String ente, String nomeLayer, String szNL, String prefix) { 
     	String[] nomicampiFk = this.addnomicampiExt(pr, ente, nomeLayer, szNL, prefix);
     	if(nomicampiFk != null){
@@ -867,6 +883,23 @@ public abstract class LayerTerritorio implements Layers, IGetFeatureInfoLayer{
 				String[] kv = key.split(":");
 				attributiFk.put(kv[0], kv[1].concat(":" + kv[2]));
     		}
+    	}
+    }
+    
+    /**
+     * @param pr
+     * @param ente
+     * @param nomeLayer
+     * @param szNL
+     * @param prefix
+     */
+    protected void addnomicampiDateFormat(Properties pr, String ente, String nomeLayer, String szNL, String prefix) { 
+    	String[] nomicampiFk = this.addnomicampiExt(pr, ente, nomeLayer, szNL, prefix);
+    	if(nomicampiFk != null){
+    		dateFormat = nomicampiFk[1];
+    	}else{
+    		// Se non definito un formato viene usato come default ISO-8601
+    		dateFormat = "YYYY-MM-DDTHH:MM:SSZ";
     	}
     }
     
@@ -5178,6 +5211,35 @@ public abstract class LayerTerritorio implements Layers, IGetFeatureInfoLayer{
 		this.attributiFk = attributiFk;
 	}
 
+	/**
+	 * @return the dateFormat
+	 */
+	public String getDateFormat() {
+		return dateFormat;
+	}
+
+	/**
+	 * @param dateFormat the dateFormat to set
+	 */
+	public void setDateFormat(String dateFormat) {
+		this.dateFormat = dateFormat;
+	}
+
+	/**
+	 * @return the defaultAttributeValues
+	 */
+	public HashMap<String, String> getDefaultAttributeValues() {
+		return defaultAttributeValues;
+	}
+
+	/**
+	 * @param defaultAttributeValues the defaultAttributeValues to set
+	 */
+	public void setDefaultAttributeValues(
+			HashMap<String, String> defaultAttributeValues) {
+		this.defaultAttributeValues = defaultAttributeValues;
+	}
+	
 //  [regionend]
 
 }
