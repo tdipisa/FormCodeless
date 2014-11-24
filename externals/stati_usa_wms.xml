@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="stati_usa_wms" class="it.prato.comune.sit.GetFeatureInfoLayer">
+		<constructor-arg value="http://localhost:8080/geoserver/ows?service=wms&amp;version=1.1.1" />
+		<constructor-arg value="Stati USA" />
+		<constructor-arg value="it.geosolutions:states" />
+		<constructor-arg value="3" /><!-- codTPN -->
+		<constructor-arg value="application/vnd.ogc.gml" />
+		<constructor-arg>
+			<ref bean="logger1" />
+		</constructor-arg>
+		
+		<property name="extraParams" value="language=ita" />
+		
+		<property name="espressioneDescrizione">
+			<value>
+				<![CDATA[
+				attributes.get("state_name");
+				]]>
+			</value>
+		</property>
+		
+		<property name="espressioneIDTPN">
+			<value>
+				<![CDATA[
+             	attributes.get("state_fips") ;
+                ]]>
+			</value>
+		</property>
+	</bean>
+</beans>

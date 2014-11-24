@@ -28,6 +28,56 @@
 	  					</azione>
 	  				</azioneList>
 	  			</azioniEventiVis>
+				<!-- Azione di cancellazione -->
+	  			<azioniEventiCanc>
+	  				<azioneList>
+	  	  				<azione>
+	  	  					<codeless>true</codeless>
+	  					</azione>
+	  				</azioneList>
+	  			</azioniEventiCanc>
+                <!-- Azione di inserimento -->
+	  			<azioniEventiIns>
+	  				<azioneList>
+	  					<azione>
+	  						<codeless>true</codeless>
+	  					</azione>
+	  				</azioneList>
+	  			</azioniEventiIns> 
+				<!-- Azione di modifica -->
+	  			<azioniEventiUpdateAlpha>
+	  				<azioneList>
+	  					<azione>
+	  						<codeless>true</codeless>
+	  					</azione>
+	  				</azioneList>
+	  			</azioniEventiUpdateAlpha> 
+				<autoIdentifyAllowed>true</autoIdentifyAllowed>
+				<autoIdentifyWithHighlight>true</autoIdentifyWithHighlight>
+			</eventiLayer>
+		    <eventiLayer>
+				<codTPN>3</codTPN>
+				<nomeLayer>stati_usa_spring</nomeLayer>
+				<descrizioneLayer>Stati USA - Spring</descrizioneLayer>
+				<tipoGeometria>3</tipoGeometria>
+				<copertura>false</copertura>
+				<caricaLayerSeparato>false</caricaLayerSeparato>
+				<!-- Azione di ricerca -->
+				<azioniEventiRicercaList>
+					<ricercaList>
+						<ricerca>
+							<idRicerca>1</idRicerca>
+						</ricerca>
+					</ricercaList>
+				</azioniEventiRicercaList>
+				<!-- Azione di identify -->
+				<azioniEventiVis>
+	  				<azioneList>
+	  					<azione>
+	  						<codeless>true</codeless>
+	  					</azione>
+	  				</azioneList>
+	  			</azioniEventiVis>
 	  			<!-- Azione di cancellazione -->
 	  			<azioniEventiCanc>
 	  				<azioneList>
@@ -55,33 +105,6 @@
 				<autoIdentifyAllowed>true</autoIdentifyAllowed>
 				<autoIdentifyWithHighlight>true</autoIdentifyWithHighlight>
 			</eventiLayer>
-		    <!-- eventiLayer>
-				<codTPN>2</codTPN>
-				<nomeLayer>stati_usa_spring</nomeLayer>
-				<descrizioneLayer>Stati USA - Spring</descrizioneLayer>
-				<tipoGeometria>3</tipoGeometria>
-				<copertura>false</copertura>
-				<caricaLayerSeparato>false</caricaLayerSeparato>
-				<azioniEventiRicercaList>
-					<ricercaList>
-						<ricerca>
-							<idRicerca>1</idRicerca>
-						</ricerca>
-					</ricercaList>
-				</azioniEventiRicercaList>
-				<azioniEventiVis>
-	  				<azioneList>
-	  					<azione>
-	  						<ajaxCall>true</ajaxCall>
-	  						<url>/tolomeobinj/LayerItemServlet</url>
-	  						<target>pannello</target>
-	  						<command>eccomi</command>
-	  					</azione>
-	  				</azioneList>
-	  			</azioniEventiVis>
-				<autoIdentifyAllowed>true</autoIdentifyAllowed>
-				<autoIdentifyWithHighlight>true</autoIdentifyWithHighlight>
-			</eventiLayer-->
 		</eventiLayerList>
 	</azioniEventi>
 	<layOut>
@@ -107,12 +130,12 @@
 									<descrizione>Stati USA - Standard</descrizione>
 									<codTPN>1</codTPN>
 								</layer>
-								<!-- layer>
+								<layer>
 									<expanded>true</expanded>
-									<name>states</name>
+									<name>it.geosolutions:states</name>
 									<descrizione>Stati USA - Spring</descrizione>
-									<codTPN>2</codTPN>
-								</layer-->
+									<codTPN>3</codTPN>
+								</layer>
 							</layerList>
 						</category>
 					</categoryList>

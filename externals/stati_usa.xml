@@ -7,7 +7,7 @@
 		http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
 	<bean id="stati_usa" class="it.prato.comune.sit.LayerTerritorioGenerico">
-		<constructor-arg value="2" /><!-- codTPN -->
+		<constructor-arg value="3" /><!-- codTPN -->
 		<constructor-arg value="Stati USA" /><!-- nome -->
 		<constructor-arg ref="logger1" /><!-- logger -->
 		
@@ -25,33 +25,80 @@
 				<entry key="NL_STATE_NAME" value="state_name" />
 				<entry key="NL_STATE_ABBR" value="state_abbr" />
 				<entry key="NL_STATE_PERS" value="persons" />
+				<entry key="NL_STATE_UPP" value="update_timestamp" />
+				<entry key="NL_STATE_CONTINENTFK" value="continent_fk" />
 			</util:map>
 		</property>
-		
+
+		<!-- Custom labels to assign to a field for presentation purpose -->  
 		<property name="elencoCampiLeggibili">
 			<util:map map-class="java.util.HashMap">
 				<entry key="NL_STATE_NAME" value="NOME STATO" />
-				<entry key="NL_STATE_ABBR" value="NOME ABBREVIATO" />
+				<entry key="NL_STATE_ABBR" value="NOME ABB" />
 				<entry key="NL_STATE_PERS" value="POPOLAZIONE" />
+			    <entry key="NL_STATE_UPP" value="AGGIORNAMENTO" />
+				<entry key="NL_STATE_CONTINENTFK" value="NOME CONTINENTE" />
 			</util:map>
 		</property>
 		
+		<!-- Regular Expressions to assign to a field for validation purpose -->
 		<property name="elencoCampiRegEx">
 			<util:map map-class="java.util.HashMap">
 				<entry key="NL_STATE_NAME" value="[a-zA-Z0-9]" />
 				<entry key="NL_STATE_ABBR" value="[A-Z]" />
 				<entry key="NL_STATE_PERS" value="[0-9]*" />
+				<entry key="NL_STATE_UPP" value="[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}\:[0-9]{2}\:[0-9]{2}" />
 			</util:map>
 		</property>
 		
+		<!-- The RW_ (Read/Write) is used in order to establish 
+		 if the field should be editable or not.            
+		 If you don't specify this for IDTPN we assume that  
+		 this field will be calculated by the servlet or     
+		 the DB  -->
 		<property name="elencoCampiReadWrite">
 			<util:map map-class="java.util.HashMap">
 				<entry key="NL_IDTPN" value="state_fips" />
+				<entry key="NL_STATE_NAME" value="state_name" />
 				<entry key="NL_STATE_ABBR" value="state_abbr" />
 				<entry key="NL_STATE_PERS" value="persons" />
+			    <entry key="NL_STATE_UPP" value="update_timestamp" />
+				<entry key="NL_STATE_CONTINENTFK" value="continent_fk" />
+			</util:map>
+		</property>
+		
+		<!-- The DV_ (Default Value) is used in order to establish 
+		 which must be the default value to assign to a field  
+		 when creating a new feature from the codeless form    
+		 (an empty value is used as default). -->
+		<property name="elencoCampiDefaultValues">
+			<util:map map-class="java.util.HashMap">
+				<entry key="NL_STATE_NAME" value="novo stato" />
+				<entry key="NL_STATE_ABBR" value="NS" />
+				<entry key="NL_STATE_PERS" value="1000" />
+			    <entry key="NL_STATE_UPP" value="2014-01-08 04:00:00" />
+				<entry key="NL_STATE_CONTINENTFK" value="Americhe" />
+			</util:map>
+		</property>
+		
+		<!-- Allows to specify all FK for the feature type             
+		 using the pattern: NL_FK=k1:d1:a1;k2:d2:a2;...           
+		 that means:                                              
+		 NL_FK={fk_name}:{decode_layer_codetpn}:{decode_layer_nl} -->
+		<property name="elencoAttributiFk">
+			<util:map map-class="java.util.HashMap">
+				<entry key="FT_STATES_FK" value="NL_STATE_CONTINENTFK:2:NL_CONTINENTNAME" />
 			</util:map>
 		</property>
 
+		<!-- Allows to specify the date format to use for   
+		 date fields in codeless form. -->
+		<property name="campoDateFormat">
+			<util:map map-class="java.util.HashMap">
+				<entry key="FT_STATES_DATE_FORMAT" value="yyyy-MM-dd'T'HH:mm:ss" />
+			</util:map>
+		</property>
+		
 		<!-- metodo che setta la descrione degli oggetti del layer -->
 		<property name="espressioneDescrizione">
 			<value>
