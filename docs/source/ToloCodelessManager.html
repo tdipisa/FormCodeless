@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">
+<span id='TolomeoExt-ToloCodelessManager'>/**
+</span> * Plugin per la gestione di richieste e operazioni 
+ * che coinvolgono la form codeless.
+ *
+ * @author Tobia Di Pisa at tobia.dipisa@geo-solutions.it
+ */
+Ext.define(&#39;TolomeoExt.ToloCodelessManager&#39;, {
+	
+	extend: &#39;Ext.util.Observable&#39;,
+	
+<span id='TolomeoExt-ToloCodelessManager-property-id'>	id: &quot;cl_manager&quot;,
+</span>	
+<span id='TolomeoExt-ToloCodelessManager-cfg-TOLOMEOServer'>	/**
+</span>	 * @cfg {String} TOLOMEOServer
+	 * URL di base del contesto di Tolomeo.
+	 */
+	TOLOMEOServer: null,
+	
+<span id='TolomeoExt-ToloCodelessManager-cfg-TOLOMEOContext'>	/**
+</span>	 * @cfg {String} TOLOMEOContext
+	 * Contesto di Tolomeo.
+	 */
+	TOLOMEOContext: null,
+	
+<span id='TolomeoExt-ToloCodelessManager-property-mapApiExt'>	/**
+</span>	 * @property {TolomeoExt.ToloMapAPIExt} mapApiExt
+	 * Oggetto di controllo della mappa.
+	 */
+	
+<span id='TolomeoExt-ToloCodelessManager-cfg-store'>	/**
+</span>	 * @cfg {Ext.data.Store} store
+	 * Store dei dati su cui agisce il manager.
+	 */
+	
+<span id='TolomeoExt-ToloCodelessManager-property-updateDialogTitle'>	/**
+</span>	 * @property {String} updateDialogTitle
+	 * Titolo da mostrare per la dialog di aggiornemnto dati.
+	 */
+    updateDialogTitle: &quot;Aggiornamento&quot;,
+    
+<span id='TolomeoExt-ToloCodelessManager-property-updateDialogText'>	/**
+</span>	 * @property {String} updateDialogText
+	 * Testo da mostrare all&#39;interno della dialog di aggiornemnto dati.
+	 */
+    updateDialogText: &quot;Non sono presenti dati da aggiornare&quot;,
+    
+<span id='TolomeoExt-ToloCodelessManager-property-deleteDialogTitle'>	/**
+</span>	 * @property {String} deleteDialogTitle
+	 * Titolo da mostrare per la dialog di cancellazione dati.
+	 */
+    deleteDialogTitle: &quot;Cancellazione&quot;,
+    
+<span id='TolomeoExt-ToloCodelessManager-property-deleteDialogText'>	/**
+</span>	 * @property {String} deleteDialogText
+	 * Testo da mostrare all&#39;interno della dialog di cancellazione dati.
+	 */
+    deleteDialogText: &quot;Procedere con la cancellazione dei dati?&quot;,
+
+<span id='TolomeoExt-ToloCodelessManager-method-constructor'>	/**
+</span>     * Crea un nuovo TolomeoExt.ToloCodelessManager.
+     * @param {Object} [config] Un opzionale oggetto di configurazione per il componente ExtJs.
+     */
+	constructor: function(config) {
+		this.callParent(arguments);
+		
+		Ext.apply(this, config);
+		
+		this.addEvents(
+<span id='TolomeoExt-ToloCodelessManager-event-loaddatafailure'>	        /**
+</span>			 * @event
+			 * Lanciato alla fallimento della richiesta.
+			 */
+			&quot;loaddatafailure&quot;,
+<span id='TolomeoExt-ToloCodelessManager-event-beforeupdatedata'>	        /**
+</span>			 * @event
+			 * Lanciato prima di effettuare la richiesta di aggiornamento dati.
+			 */
+			&quot;beforeupdatedata&quot;,
+<span id='TolomeoExt-ToloCodelessManager-event-beforeloaddata'>	        /**
+</span>			 * @event
+			 * Lanciato prima di effettuare la richiesta di caricamento dati.
+			 */
+			&quot;beforeloaddata&quot;,
+<span id='TolomeoExt-ToloCodelessManager-event-loaddata'>	        /**
+</span>			 * @event
+			 * Lanciato al termine della richiesta di caricamento se questa è andata a buon fine.
+			 */
+			&quot;loaddata&quot;,
+<span id='TolomeoExt-ToloCodelessManager-event-updatedata'>	        /**
+</span>			 * @event
+			 * Lanciato al termine della richiesta di aggiornamento se questa è andata a buon fine.
+			 */
+			&quot;updatedata&quot;,
+<span id='TolomeoExt-ToloCodelessManager-event-beforedeletedata'>	        /**
+</span>			 * @event
+			 * Lanciato prima di effettuare la richiesta di cancellazione dei dati.
+			 */
+			&quot;beforedeletedata&quot;,
+<span id='TolomeoExt-ToloCodelessManager-event-deletedata'>	        /**
+</span>			 * @event
+			 * Lanciato al termine della richiesta di cancellazione se questa è andata a buon fine.
+			 */
+			&quot;deletedata&quot;,
+<span id='TolomeoExt-ToloCodelessManager-event-beforecreatedata'>	        /**
+</span>			 * @event
+			 * Lanciato prima di effettuare la richiesta di creazione di una feature.
+			 */
+			&quot;beforecreatedata&quot;,
+<span id='TolomeoExt-ToloCodelessManager-event-createdata'>	        /**
+</span>			 * @event
+			 * Lanciato al termine della richiesta di creazione di una nuova feature se questa è andata a buon fine.
+			 */
+			&quot;createdata&quot;,
+<span id='TolomeoExt-ToloCodelessManager-event-objectselected'>	        /**
+</span>			 * @event
+			 * Lanciato a seguito della selezione di una feature in mappa.
+			 */
+			&quot;objectselected&quot;,
+<span id='TolomeoExt-ToloCodelessManager-event-changemode'>	        /**
+</span>			 * @event
+			 * Lanciato a seguito del cambio di modalità di funzionamento (edit, view o new)
+			 */
+			&quot;changemode&quot;,
+<span id='TolomeoExt-ToloCodelessManager-event-restore'>	        /**
+</span>			 * @event
+			 * Lanciato a seguito del ripristino dello store ai valori iniziali
+			 */
+			&quot;restore&quot;
+		);	
+	},
+	
+<span id='TolomeoExt-ToloCodelessManager-method-setMapApiExt'>	/**
+</span>     * Imposta l&#39;oggetto di controllo della mappa per intercettare le 
+     * operazioni utente (eventi tolomeo) e procedere con la gestione della form.
+     * @param {TolomeoExt.ToloMapAPIExt} mapApiExt oggetto di controllo della mappa.
+     */
+	setMapApiExt: function(mapApiExt){
+		this.mapApiExt = mapApiExt;
+		this.mapApiExt.on({
+			codelessaction: function(eventoLayer, tipoEvento, object){
+				this.selection = object;
+				
+				switch(tipoEvento){
+					case 0: // Identify
+						// /////////////////////////////////////////////
+						// Caricamento di tutte le informazioni al 
+						// fine di preparare la griglia per la modalità
+						// di visualizzazione
+						// /////////////////////////////////////////////
+						var fparams = {
+							codTPN: this.selection.codTPN,
+							command: &quot;view&quot;,
+							IDTPN: this.selection.key
+						}; 
+						
+						this.loadViewMode(fparams);
+						break;
+					case 1: // Delete
+			    		Ext.MessageBox.confirm(
+		    				this.deleteDialogTitle, 
+		    				this.deleteDialogText, 
+		    				function(btn){
+			    			   if(btn === &#39;yes&#39;){
+									// ///////////////////////////////////////
+									// Cancella l&#39;oggetto selezionato
+									// ///////////////////////////////////////
+									var fparams = {
+										codTPN: this.selection.codTPN,
+										command: &quot;delete&quot;,
+										IDTPN: this.selection.key
+									}; 
+									
+									this.cancel(fparams);
+			    			   }
+		    				}, 
+		    				this
+						);
+						break;
+					case 3: // Edit
+						// /////////////////////////////////////////////
+						// Caricamento di tutte le informazioni al 
+						// fine di preparare la griglia per la modalità 
+						// di modifica
+						// /////////////////////////////////////////////
+						var fparams = {
+							codTPN: this.selection.codTPN,
+							command: &quot;edit&quot;,
+							IDTPN: this.selection.key
+						}; 
+						
+						this.loadEditMode(fparams);
+						break;
+					case 4: // New
+						// ////////////////////////////////////////////
+						// Caricamento di tutte le informazioni al 
+						// fine di preparare la griglia per l&#39;aggiunta 
+						// di un nuovo elemento 
+						// ////////////////////////////////////////////
+						if(!this.selection){
+							this.selection = this.mapApiExt.geoCoordField.getValue();
+							this.selection = Ext.decode(this.selection);
+						}
+						
+						var fparams = {
+							codTPN: this.selection.codTPN,
+							command: &quot;edit&quot;
+						}; 
+						
+						this.loadEditMode(fparams, true);
+						break;
+				}
+			},	
+			onObjectSelect: function(){
+				this.fireEvent(&quot;objectselected&quot;);
+			},
+			scope: this
+		});
+	},
+	
+<span id='TolomeoExt-ToloCodelessManager-method-setMode'>	/**
+</span>     * Imposta la modalità di funzionamento del manager.
+     * @param {String} mode Modalità di configurazione (view, edit, new).
+     * @param {Ext.Data.Store} store Store da usare per componenti di tipo UI
+     */
+	setMode: function(mode, store){
+		this.store = store;
+		this.fireEvent(&quot;changemode&quot;, mode, store);
+	},
+	
+<span id='TolomeoExt-ToloCodelessManager-method-doAjaxFailure'>	/**
+</span>     * Handler invocato in caso di fallimento della richiesta Ajax.
+     * @param {Ext.Data.Store} store Oggetto rappresentante lo store dei dati. 
+     *
+     */
+	doAjaxFailure: function (store) {
+		this.fireEvent(&quot;loaddatafailure&quot;, store);
+    },
+    
+<span id='TolomeoExt-ToloCodelessManager-method-loadViewMode'>    /**
+</span>     * Metodo di caricamento dello store delle features per la modalità &#39;view&#39;.
+     * @param {Object} fparams Oggetto contenente i parametri che saranno usati nella richista. 
+     *
+     */
+    loadViewMode: function(fparams){       	
+    	this.fireEvent(&quot;beforeloaddata&quot;);
+    	
+		this.request(
+			fparams,
+			&quot;GET&quot;,
+    		function(results, store){
+				this.setMode(&quot;view&quot;, store);
+    			this.fireEvent(&quot;loaddata&quot;, store);
+    		},
+    		this.doAjaxFailure,
+    		this
+		);
+    },
+    
+<span id='TolomeoExt-ToloCodelessManager-method-loadEditMode'>    /**
+</span>     * Metodo di caricamento dello store delle features per la modalità &#39;edit&#39;.
+     * @param {Object} fparams Oggetto contenente i parametri che saranno usati nella richista. 
+     *
+     */
+    loadEditMode: function(fparams, isNew){       	
+    	this.fireEvent(&quot;beforeloaddata&quot;);
+    	
+		this.request(
+			fparams,
+			&quot;GET&quot;,
+    		function(results, store){
+				var mode = &quot;edit&quot;;
+				// //////////////////////////////////////////////////////////////
+				// Controlla se stiamo cercando di creare un nuovo elemento o no 
+				// //////////////////////////////////////////////////////////////
+				if(isNew){
+					mode = &quot;new&quot;;
+				}
+				
+				this.setMode(mode, store);
+    			this.fireEvent(&quot;loaddata&quot;, store);
+    		},
+    		this.doAjaxFailure,
+    		this
+		);
+    },
+    
+<span id='TolomeoExt-ToloCodelessManager-method-update'>    /**
+</span>     * Metodo di aggiornamento dei dati.
+     * @param {Object} fparams Oggetto contenente i parametri che saranno usati nella richista. 
+     *
+     */
+    update: function(fparams){
+    	this.fireEvent(&quot;beforeupdatedata&quot;);
+    	
+    	var updatedRecords = this.store.getUpdatedRecords();
+    	
+    	if(updatedRecords.length &gt; 0){
+    		var params = Ext.applyIf(
+				{
+					codTPN: this.selection.codTPN,
+					command: &quot;update&quot;,
+					IDTPN: this.selection.key
+				}, 
+				fparams
+			); 
+    		
+    		var data = &quot;[&quot;;
+    		for(var i=0; i&lt;updatedRecords.length; i++){
+    			var record = updatedRecords[i];
+    			var values = record.data;
+    			data += Ext.encode(values);
+    			
+    			if(i+1 != updatedRecords.length){
+    				data += &quot;,&quot;;
+    			}
+    		}
+    		data += &quot;]&quot;;
+    		
+    		params.data = data;
+    		
+    		this.request(
+				params,
+				&quot;POST&quot;,
+				function(results, store){
+					// /////////////////////////////////////////////////
+					// Ridisegna il layer per aggiornare lo stato di 
+					// eventiali etichette che sono state modificate 
+					// durante la procedura di aggiornamento.
+					// /////////////////////////////////////////////////
+					this.mapApiExt.viewer.pluginRefreshMap();
+					
+					this.setMode(&quot;edit&quot;, store);
+	    			this.fireEvent(&quot;updatedata&quot;, store);
+	    		},
+	    		this.doAjaxFailure,
+	    		this
+    		);
+    	}else{
+            Ext.Msg.show({
+                title: this.updateDialogTitle,
+                msg: this.updateDialogText,
+                buttons: Ext.Msg.OK,
+                icon: Ext.MessageBox.INFO
+            }); 
+    	}
+    },
+    
+<span id='TolomeoExt-ToloCodelessManager-method-cancel'>    /**
+</span>     * Metodo di cancellazione dei dati.
+     * @param {Object} fparams Oggetto contenente i parametri che saranno usati nella richista. 
+     *
+     */
+    cancel: function(fparams){
+    	this.fireEvent(&quot;beforedeletedata&quot;);
+    	
+		this.request(
+			fparams,
+			&quot;POST&quot;,
+    		function(results){
+				if(results){
+					// /////////////////////////////////////////////////
+					// Ridisegna il layer per aggiornare lo stato di 
+					// eventiali etichette che sono state modificate 
+					// durante la procedura di aggiornamento.
+					// /////////////////////////////////////////////////
+					this.mapApiExt.viewer.pluginRefreshMap();
+					
+					this.fireEvent(&quot;deletedata&quot;, results);
+					
+					// ////////////////////////////////////
+					// Informa l&#39;utente che l&#39;operazione è 
+					// stata completata con successo.
+					// ////////////////////////////////////
+		            Ext.Msg.show({
+		                title: this.deleteDialogTitle,
+		                msg: results[0].data.Descrizione,
+		                buttons: Ext.Msg.OK,
+		                icon: Ext.MessageBox.INFO
+		            }); 
+				}			
+    		},
+    		this.doAjaxFailure,
+    		this
+		);
+    },
+    
+<span id='TolomeoExt-ToloCodelessManager-method-create'>    /**
+</span>     * Metodo per la raccolta dati al fine di creare un nuovo elemento.
+     * @param {Object} fparams Oggetto contenente i parametri che saranno usati nella richista. 
+     *
+     */
+    create: function(fparams){
+    	this.fireEvent(&quot;beforecreatedata&quot;);
+    	var updatedRecords = this.store.getUpdatedRecords();
+    	
+    	if(updatedRecords.length &gt; 0){
+    		var params = Ext.applyIf(
+				{
+					codTPN: this.selection.codTPN,
+					command: &quot;new&quot;,
+					SRID: this.selection.SRID,
+					geometry: this.selection.geometry
+				}, 
+				fparams
+			); 
+    		
+    		var data = &quot;[&quot;;
+    		for(var i=0; i&lt;updatedRecords.length; i++){
+    			var record = updatedRecords[i];
+    			var values = record.data;
+    			data += Ext.encode(values);
+    			
+    			if(i+1 != updatedRecords.length){
+    				data += &quot;,&quot;;
+    			}
+    		}
+    		data += &quot;]&quot;;
+    		
+    		params.data = data;
+    		
+    		this.request(
+				params,
+				&quot;POST&quot;,
+				function(results, store){
+					// /////////////////////////////////////////////////
+					// Ridisegna il layer per aggiornare lo stato di 
+					// eventiali etichette che sono state modificate 
+					// durante la procedura di aggiornamento.
+					// /////////////////////////////////////////////////
+					this.mapApiExt.viewer.pluginRefreshMap();
+					
+					this.setMode(&quot;edit&quot;, store);
+	    			this.fireEvent(&quot;createdata&quot;, store);
+	    		},
+	    		this.doAjaxFailure,
+	    		this
+    		);
+    	}else{
+            Ext.Msg.show({
+                title: this.updateDialogTitle,
+                msg: this.updateDialogText,
+                buttons: Ext.Msg.OK,
+                icon: Ext.MessageBox.INFO
+            }); 
+    	}
+    },
+    
+<span id='TolomeoExt-ToloCodelessManager-method-request'>    /**
+</span>     * Metodo di gestione della richiesta Ajax.
+     */    
+    request: function(params, method, success, failure, scope){
+    	var submitOpt = {
+    		url: this.TOLOMEOServer + this.TOLOMEOContext + &#39;/LayerItemServlet&#39;,
+    		method: method,
+    		params: params,
+    		success: success,
+    		failure: failure ? failure : this.doAjaxFailure,
+    		scope: scope
+    	};
+    	
+		new TolomeoExt.ToloCrossAjax().request(submitOpt);
+    },
+    
+<span id='TolomeoExt-ToloCodelessManager-method-getRequestMetadata'>    /**
+</span>     * Restituisce i metadati della richiesta.
+     */  
+    getRequestMetadata: function(store){
+    	var gridStore = store || this.store;
+		var proxy = gridStore.getProxy();
+		var reader = proxy.getReader();
+		var metadata = reader.metaData;
+		
+		return metadata;
+    },
+    
+<span id='TolomeoExt-ToloCodelessManager-method-restore'>    /**
+</span>     * Ripristina i dati nello store eliminando le modifiche.
+     *
+     */
+    restore: function(){
+    	this.store.rejectChanges();
+    	this.fireEvent(&quot;restore&quot;);
+    }
+	
+});</pre>
+</body>
+</html>
